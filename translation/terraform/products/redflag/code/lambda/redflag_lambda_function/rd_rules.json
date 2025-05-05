@@ -1,0 +1,2838 @@
+[
+    {
+        "keywords": [
+            "job",
+            "loss"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:job|jobs)\\b(?:\\s+\\w+\\b){0,5}\\s+\\b(?:loss|losses)\\b|\\b(?:loss|losses)\\b(?:\\s+\\w+\\b){0,5}\\s+\\b(?:job|jobs)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "medical",
+            "bill"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:medical)\\b(?:\\s+\\w+\\b){0,5}\\s+\\b(?:bill|bills)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "mental",
+            "health"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:mental)\\b(?:\\s+\\w+\\b){0,5}\\s+\\b(?:health)\\b|\\b(?:health)\\b(?:\\s+\\w+\\b){0,5}\\s+\\b(?:mental)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "just",
+            "pass",
+            "away"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:just)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:pass|passed|passing|passes)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:away)\\b|\\b(?:just)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:away)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:pass|passed|passing|passes)\\b|\\b(?:away)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:pass|passed|passing|passes)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:just)\\b|\\b(?:away)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:just)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:pass|passed|passing|passes)\\b|\\b(?:pass|passed|passing|passes)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:just)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:away)\\b|\\b(?:pass|passed|passing|passes)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:away)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:just)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "get",
+            "debt"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:get|gets|getting|got|gotten|gone)\\b(?:\\s+\\w+\\b){0,5}\\s+\\b(?:debt|debts)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:negative|reais)\\b",
+            "\\b(?:debt)\\b(?:\\s+\\w+\\b){0,1}?\\s+\\b(?:card|cards)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "cut",
+            "wrist"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:cut|cuts|cutting)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:wrist|wrists)\\b|\\b(?:wrist|wrists)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:cut|cuts|cutting)\\b",
+            "(?:cut|cuts|cutting).*?(?:wrist|wrists)|(?:wrist|wrists).*?(?:cut|cuts|cutting)"
+        ]
+    },
+    {
+        "keywords": [
+            "lose",
+            "much"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:lose|lost|losing)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:much)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:pretty)\\b",
+            "\\b(?:no|not)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:lose)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "lose",
+            "too much"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:too much|to much)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:lose|lost|losing)\\b|\\b(?:lose|lost|losing)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:too much|to much)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "too many",
+            "loss"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:too many|to many)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:loss|losses)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "need",
+            "this",
+            "money"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:need|needs|needing|needed)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:this)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:money)\\b|\\b(?:money)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:this)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:need|needs|needing|needed)\\b|\\b(?:this)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:money)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:need|needs|needing|needed)\\b|\\b(?:this)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:need|needs|needing|needed)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:money)\\b|\\b(?:money)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:need|needs|needing|needed)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:this)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:place)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:bet|bets)\\b|\\b(?:bet|bets)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:place)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "need",
+            "that",
+            "money"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:need|needs|needing|needed)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:that)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:money)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "money",
+            "problem"
+        ],
+        "max_distance": 1,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\bmoney\\b(?:\\s+\\b\\w+\\b){0,1}\\s+\\b(?:problem|problems|issue|issues|hassle|hassles|trouble|troubles)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:deposit|depositing|depoist|pay_in|pay in|de-posit|cash out|cashing out|cashout|cash_out|cash-out|withdraw|withdrawing|withdrawal|withdrawl|widraw|widrawing|with-drawing)\\b",
+            "\\b(?:transfer|transferred|take|took|taking|transferring|transfering|get|got|getting|gotten|gets)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:money)\\b",
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:no|not)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "money",
+            "difficulty"
+        ],
+        "max_distance": 2,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\bmoney\\b(?:\\s+\\b\\w+\\b){0,2}\\s+\\b(?:difficulty|difficulties)\\b|\\b(?:difficulty|difficulties)\\b(?:\\s+\\b\\w+\\b){0,2}\\s+\\bmoney\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:deposit|depositing|depoist|pay_in|pay in|de-posit|cash out|cashing out|cashout|cash_out|cash-out|withdraw|withdrawing|withdrawal|withdrawl|widraw|widrawing|with-drawing)\\b",
+            "\\b(?:transfer|transferred|transferring|transfering)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:money)\\b",
+            "\\b(?:exclude)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:customer)\\b",
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "spend",
+            "too much"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:spent|spend)(?:\\s+\\b\\w+\\b){0,5}?\\s+\\b(?:too much|to much|to mutch|so much|excessively)\\b|\\b(?:too much|to much|to mutch|so much|excessively)(?:\\s+\\b\\w+\\b){0,5}?\\s+\\b(?:spent|spend)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b",
+            "\\b(?:time)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "spending",
+            "too much"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:spending)(?:\\s+\\b\\w+\\b){0,5}?\\s+\\b(?:too much|to much|to mutch|so much|excessively)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:no|not)\\b(?:\\s+\\w+\\b){0,1}?\\s+\\b(?:spending)\\b",
+            "\\b(?:nothing|no|not)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:spending)\\b",
+            "\\b(?:unblock)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "spending",
+            "a lot"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:spending)(?:\\s+\\b\\w+\\b){0,5}?\\s+\\b(?:a lot|alot)\\b|\\b(?:a lot|alot)(?:\\s+\\b\\w+\\b){0,5}?\\s+\\b(?:spending)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "need",
+            "food"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:need|needs|needing|needed)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:food|foods)\\b|\\b(?:food|foods)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:need|needs|needing|needed)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "without",
+            "food"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:without|with out)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:food|foods)\\b|\\b(?:food|foods)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:without|with out)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "drink",
+            "food"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:drink|drinking|drinks)\\b(?:\\s+[\\w'\u2019&]+){0,5}?\\s+\\b(?:food|foods)\\b|\\b(?:food|foods)\\b(?:\\s+[\\w'\u2019&]+){0,5}?\\s+\\b(?:drink|drinking|drinks)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "few",
+            "drink"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:drink|drinking|drinks)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:few)\\b|\\b(?:few)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:drink|drinking|drinks)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "drink",
+            "too much"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:drink|drinking|drinks)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:too much|to much|too many|to many)\\b|\\b(?:too much|to much|too many|to many)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:drink|drinking|drinks)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "be",
+            "drink"
+        ],
+        "max_distance": 1,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:be|am|are|we|is|was|were|being|been)\\b(?:\\s+\\w+\\b){0,1}?\\s+\\b(?:drink|drinks)\\b|\\b(?:drink|drinks)\\b(?:\\s+\\w+\\b){0,1}?\\s+\\b(?:be|am|are|we|is|was|were|being|been)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:coffee|tea|tobacco|euro)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "be",
+            "drinking"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:be|am|are|we|is|was|were|being|been)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:drinking)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "drink",
+            "last night"
+        ],
+        "max_distance": 8,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:drink|drinks)\\b(?:\\s+\\w+\\b){0,8}?\\s+\\b(?:last night|lastnight)\\b|\\b(?:last night|lastnight)\\b(?:\\s+\\w+\\b){0,8}?\\s+\\b(?:drink|drinks)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "drunk",
+            "last night"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:drunk|drunken)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:last night|lastnight)\\b|\\b(?:last night|lastnight)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:drunk|drunken)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "I",
+            "drink"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:i|we|im|i'm|i\u2019m)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:drink|drank|drinking)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "out of",
+            "control"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:out of)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\bcontrol\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b",
+            "\\b(?:your)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:control)\\b",
+            "\\b(?:this)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:out of)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "no",
+            "control"
+        ],
+        "max_distance": 2,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:no|not|cant|can t|can't|can\u2019t|couldn|couldn t|couldn't|couldn\u2019t|couldnt|cldnt|dont|don t|don't|don\u2019t|wouldnt|wouldn t|wouldn't||wouldn\u2019t)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:control)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:bet|customer|internet|cash out|cashout|cashingout|cashing out|cashedout|cashed out|vendor|suspend|spin|account|postpone|table|bonus|system|crash|slot|match|schedule)\\b",
+            "\\b(?:internet)\\b(?:\\s+\\w+\\b){0,2}?\\s+\\b(?:connection)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "no",
+            "control",
+            "closure"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "(?=.*?\\b(?:no|not|cant|can t|can't|can\u2019t|couldn|couldn t|couldn't|couldn\u2019t|couldnt|cldnt|dont|don t|don't|don\u2019t|wouldnt|wouldn t|wouldn't||wouldn\u2019t)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:control)\\b)(?=.*?\\b(?:closure|delete|close)\\b).*|(?=.*?\\b(?:control)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:no|not|cant|can t|can't|can\u2019t|couldn|couldn t|couldn't|couldn\u2019t|couldnt|cldnt|dont|don t|don't|don\u2019t)\\b)(?=.*?\\b(?:closure|delete|close)\\b).*"
+        ]
+    },
+    {
+        "keywords": [
+            "was",
+            "control"
+        ],
+        "max_distance": 2,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(was\\s+not|wasn(?:'|\\s*)t|no|not)(?:\\s+\\w+){0,2}?\\s+control\\b|\\bcontrol\\b(?:\\s+\\w+\\b){0,2}?\\s+\\b(was\\s+not|wasn(?:'|\\s*)t|no|not)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "rent",
+            "money"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:rent|rents|renting|rented)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:money)\\b|\\b(?:money)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:rent|rents|renting|rented)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "ruin",
+            "life"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:ruin|ruins|ruined|ruining)\\b(?:\\s+[\\w'\u2019]+){0,5}?\\s+\\b(?:life|lives|family|me|us)\\b|\\b(?:life|lives|family|me|us)\\b(?:\\s+[\\w'\u2019]+){0,5}?\\s+\\b(?:ruin|ruins|ruined|ruining)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "ruin",
+            "family"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:ruin|ruins|ruined|ruining)\\b(?:\\s+[\\w'\u2019]+){0,5}?\\s+\\b(?:family|families)\\b|\\b(?:family|families)\\b(?:\\s+[\\w'\u2019]+){0,5}?\\s+\\b(?:ruin|ruins|ruined|ruining)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "ruin",
+            "me"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:ruin|ruins|ruined|ruining)\\b(?:\\s+[\\w'\u2019]+){0,2}?\\s+\\b(?:me|us)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "ruin",
+            "job"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:ruin|ruins|ruined|ruining)\\b(?:\\s+[\\w'\u2019]+){0,5}?\\s+\\b(?:job|jobs)\\b|\\b(?:job|jobs)\\b(?:\\s+[\\w'\u2019]+){0,5}?\\s+\\b(?:ruin|ruins|ruined|ruining)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "lose",
+            "family"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:lose|loses|lost)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:family|families)\\b|\\b(?:family|families)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:lose|loses|lost)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "lose",
+            "employment"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:lose|loses|lost)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:employment)\\b|\\b(?:employment)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:lose|loses|lost)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "need",
+            "urgently"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:need|needs|needing|needed)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:urgently|urgent)\\b|\\b(?:urgently|urgent)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:need|needs|needing|needed)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:need|needs|needing|needed)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:access|contact|speak|feedback|fix|talk)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "gamble",
+            "too much"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:gamble|gambling|gambled|gambles)\\b(?:\\s+\\b\\w+\\b){0,5}\\s+\\b(?:too much|to much|lot|lots)\\b|\\b(?:too much|to much|lot|lots)\\b(?:\\s+\\b\\w+\\b){0,5}\\s+\\b(?:gamble|gambling|gambled|gambles)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "gamble",
+            "issue"
+        ],
+        "max_distance": 2,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:gamble)\\b(?:\\s+\\b\\w+\\b){0,2}\\s+\\b(?:problem|problems|issue|issues|trouble|troubles|troubling|hassle)\\b|\\b(?:problem|problems|issue|issues|trouble|troubles|troubling|hassle)\\b(?:\\s+\\b\\w+\\b){0,2}\\s+\\b(?:gamble)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible|personal)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b",
+            "\\b(?:reopen|reopening|reopened|reopens|re-open|re-opening|re-opened|re-opens|reactivate|open)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:account)\\b",
+            "\\b(?:no|not)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:financial|gamble)\\b",
+            "\\b(?:neither)\\b(?:\\s+\\w+\\b){0,2}?\\s+\\b(?:financial)\\b",
+            "\\b(?:no|not)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:problem|problems|issue|issues|trouble|troubles|troubling|hassle)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "gambler",
+            "problem"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:gambler)\\b(?:\\s+\\b\\w+\\b){0,5}\\s+\\b(?:problem|problems)\\b|\\b(?:problem|problems)\\b(?:\\s+\\b\\w+\\b){0,2}\\s+\\b(?:gambler)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "gambling",
+            "issue"
+        ],
+        "max_distance": 2,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:gambling)\\b(?:\\s+\\b\\w+\\b){0,2}\\s+\\b(?:problem|problems|issue|issues|trouble|troubles|troubling|hassle)\\b|\\b(?:problem|problems|issue|issues|trouble|troubles|troubling|hassle)\\b(?:\\s+\\b\\w+\\b){0,2}\\s+\\b(?:gambling)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b",
+            "\\b(?:reopen|reopening|reopened|reopens|re-open|re-opening|re-opened|re-opens|reactivate|open)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:account)\\b",
+            "\\b(?:no|not|haven\u2019t|havent|haven t|haven't)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "gaming",
+            "issue"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:gaming)\\b(?:\\s+\\b\\w+\\b){0,5}\\s+\\b(?:problem|problems|issue|issues|trouble|troubles|troubling|hassle)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible|never|personal)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b",
+            "\\b(?:reopen|reopening|reopened|reopens|re-open|re-opening|re-opened|re-opens|reactivate|open)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:account)\\b",
+            "\\b(?:no|not)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:financial|problem|problems|issue|issues|trouble|troubles|troubling|hassle)\\b",
+            "\\b(?:no|not)\\b(?:\\s+\\w+\\b){0,8}?\\s+\\b(?:gaming)\\b",
+            "\\b(?:your)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:problem)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "gambling",
+            "control"
+        ],
+        "max_distance": 6,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:gamble|gambling|gaming)\\b(?:\\s+\\b\\w+\\b){0,5}\\s+\\b(?:control)\\b|\\b(?:control)\\b(?:\\s+\\b\\w+\\b){0,5}\\s+\\b(?:gamble|gambling|gaming)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "personal",
+            "problem"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:personal)\\b(?:\\s+\\b\\w+\\b){0,5}\\s+\\b(?:problem|problems)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:personal)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:data)\\b",
+            "\\b(?:no|not)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:problem|financial)\\b",
+            "\\b(?:no|not)\\b(?:\\s+\\w+\\b){0,8}?\\s+\\b(?:personal)\\b",
+            "\\b(?:under)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:control)\\b",
+            "\\b(?:problem)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:me|us)\\b",
+            "\\b(?:problem)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:phone|smartphone|smart phone|none)\\b",
+            "\\b(?:your)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:personal)\\b",
+            "\\b(?:totally)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsible)\\b",
+            "\\b(?:you)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:personal)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "help",
+            "gambling"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:help|helping)\\b(?:\\s+\\b\\w+\\b){0,5}\\s+\\b(?:gamble|gambling)\\b|\\b(?:gamble|gambling)\\b(?:\\s+\\b\\w+\\b){0,5}\\s+\\b(?:help|helping)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:someone|illegal|fun|desk|back)\\b",
+            "\\b(?:no\\|not)\\b(?:\\s+\\w+\\b){0,4}?\\s+\\b(?:need)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "pathological",
+            "gambling"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:pathological)\\b(?:\\s+\\b\\w+\\b){0,5}\\s+\\b(?:gambling)\\b|\\b(?:gambling)\\b(?:\\s+\\b\\w+\\b){0,5}\\s+\\b(?:pathological)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "can",
+            "no",
+            "afford"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:can)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:no|not)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:afford|afforded)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "no",
+            "afford"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:no|not|cant|can t|can't|can\u2019t|couldn|couldn t|couldn't|couldn\u2019t|couldnt|cldnt|dont|don t|don't|don\u2019t|wouldnt|wouldn t|wouldn't||wouldn\u2019t)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:afford|afforded)\\b|\\b(?:afford|afforded)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:no|not|cant|can t|can't|can\u2019t|couldn|couldn t|couldn't|couldn\u2019t|couldnt|cldnt|dont|don t|don't|don\u2019t)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "pay",
+            "my",
+            "bill"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:pay|paying|paid)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:bill|bills)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "hospital"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:hospital|hospitals)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "anxiety"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:anxiety|anxieties)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "my",
+            "health"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:health)\\b|\\b(?:health)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:my|mine|ours|our)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:health)\\b(?:\\s+\\w+\\b){0,2}?\\s+\\b(?:card)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "desperate"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:desperate)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "desperate",
+            "money"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:desperate)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:money)\\b|\\b(?:money)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:desperate)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "homeless"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\bhomeless\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b",
+            "\\b(?:homeless)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:person|people|charity|dog)\\b",
+            "\\b(?:you)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:homeless)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "I",
+            "steal"
+        ],
+        "max_distance": 3,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:i|we|im|i'm|i\u2019m)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:steal|stole|stolen)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:no|not)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:steal|stole|stolen)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "my",
+            "kid"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:my|mine|ours|our)\\b(?:\\s+[\\w'\u2019]+){0,5}\\s+\\b(?:kid|kids)\\b|\\b(?:kid|kids)\\b(?:\\s+[\\w'\u2019]+){0,5}\\s+\\b(?:my|mine|ours|our)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:kid|kids)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:bed|screan)\\b",
+            "\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+\\b){0,2}?\\s+\\b(?:account|lawyer)\\b",
+            "\\b(?:chill)\\b(?:\\s+\\w+\\b){0,2}?\\s+\\b(?:out)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "my",
+            "rent"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:rent|rents)\\b|\\b(?:rent|rents)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:my|mine|ours|our)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:rent)\\b(?:\\s+\\w+\\b){0,1}?\\s+\\b(?:card)\\b",
+            "\\b(?:upload|receipt|include|document|fax|paperwork|documentation|free|room|passport|address|utility|contract|picture|name|invoice)\\b",
+            "\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+\\b){0,2}?\\s+\\b(?:house)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "kill",
+            "myself"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:kill|killing|killed|killthemselves)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:myself|my self|me|himself|him self|her self|herself|themselves|them selves)\\b|\\b(?:myself|my self|me|himself|herself|him self|her self|themselves|them selves)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:kill|killing|killed|killthemselves)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "self",
+            "control"
+        ],
+        "max_distance": 1,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:self)\\b(?:\\s+\\w+){0,1}\\s+\\b(?:control)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "suicide"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\bsuicide\\b|\\bsuicides\\b|\\bsuicidal\\b|\\bsuicid\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "dead"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\bdead\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:dead)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:bet|heat|end|helpful|head|card|sea|grateful|page|line|laugh|zone|air|wrong|lock|account)\\b",
+            "\\b(?:dead)\\b(?:\\s+\\w+){0,4}?\\s+\\b(?:tourniu|hit|heatb1)\\b",
+            "\\b(?:dead)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:machine)\\b",
+            "\\b(?:phone|smartphone|book|chat|slot|spin|evil|walk|screen|wheel|bock|booke|game|cell phone|battery|qr|go)\\b(?:\\s+\\w+\\b){0,4}?\\s+\\b(?:dead)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "death"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:death|deaths)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:death|deaths)\\b(?:\\s+\\w+\\b){0,2}?\\s+\\b(?:duty)\\b",
+            "\\b(?:sick|book|legacy)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:death|deaths)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "died"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:died)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:phone|tablet|battery|internet)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "I",
+            "die"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:i|we|im|i'm|i\u2019m)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:die|dies|dying)\\b|\\b(?:die|dies|dying)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:i|we)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:it)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:die)\\b",
+            "\\b(?:dice)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "drug"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\bdrugs?\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:you)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:drug)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "crisis"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\bcrisis\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "compulsive"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\bcompulsive\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,4}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "depression"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:depression)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "depressed"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:depressed)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "obsessed"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:obsessed)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "therapy"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:therapy)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "vulnerable"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:vulnerable)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "medication"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:medication|medications)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "distress"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:distress|distressing|distressed)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "physcologically"
+        ],
+        "max_distance": 0,
+        "regex_patterns": [
+            "\\b(?:physcologically)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:physcologically)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:ok)\\b",
+            "\\b(?:you|good)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:physcologically)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "domestic",
+            "abuse"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:domestic)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:abuse|abused|abusing)\\b|\\b(?:abuse|abused|abusing)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:domestic)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "drink",
+            "drive"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:drink|drinks)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:drive|drives|driving)\\b|\\b(?:drive|drives|driving)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:drink|drinks)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "drinking",
+            "bit"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:drinking)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:bit)\\b|\\b(?:bit)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:drinking)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "domestic",
+            "violence"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:domestic)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:violence)\\b|\\b(?:violence)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:domestic)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "cause",
+            "stress"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:cause|causes|causing|caused)\\b(?:\\s+[\\w'\u2019]+){0,5}?\\s+\\b(?:stress|stressed|stressing)\\b|\\b(?:stress|stressed|stressing)\\b(?:\\s+[\\w'\u2019]+){0,5}\\s+\\b(?:cause|causes|causing|caused)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "panic",
+            "attack"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:panic)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:attack|attacks|attacked)\\b|\\b(?:attack|attacks|attacked)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:panic)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "buy",
+            "medicine"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:buy|buys)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:medicine|medicines)\\b|\\b(?:medicine|medicines)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:buy|buys)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "take",
+            "medicine"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:take|took|takes)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:medicine|medicines)\\b|\\b(?:medicine|medicines)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:take|took|takes)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:you|your)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:medicine|medicines)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "need",
+            "medicine"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:need|needs)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:medicine|medicines)\\b|\\b(?:medicine|medicines)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:need|needs)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "spend",
+            "medicine"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:spend|spends|spent)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:medicine|medicines)\\b|\\b(?:medicine|medicines)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:spend|spends|spent)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "house",
+            "bind"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:house)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:bind|bound)\\b|\\b(?:bind|bound)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:house)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "I",
+            "prison"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:i|we|im|i'm|i\u2019m|i've|i\u2019ve|ive)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:prison)\\b|\\b(?:prison)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:i|we|im|i'm|i\u2019m|i've|i\u2019ve|ive)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "I",
+            "disturbed"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:i|we|im|i'm|i\u2019m)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:disturbed)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "I",
+            "jail"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:i|we|im|i'm|i\u2019m|i\u2019d|i'd|id|i d)\\b(?:\\s+[\\w'\u2019]+){0,5}?\\s+\\b(?:jail|jailed)\\b|\\b(?:jail|jailed)\\b(?:\\s+[\\w'\u2019]+){0,5}?\\s+\\b(?:i|we|im|i'm|i\u2019m|i\u2019d|i'd|id|i d)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:jail)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:break|pix)\\b",
+            "\\b(?:go)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:jail)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "I",
+            "arrest"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:i|we|im|i'm|i\u2019m)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:arrest|arrests|arrested)\\b|\\b(?:arrest|arrests|arrested)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:i|we)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "I",
+            "drunk"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:i|we|im|i'm|i\u2019m)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:drunk)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "redundant"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:redundant)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "inheritance"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\binheritance\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "repossess"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:repossess|repossessed)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "I",
+            "crime"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:i|we|im|i'm|i\u2019m|ive|i've|i ve|i\u2019ve|i'll|i ll|ill|i\u2019ll)\\b(?:\\s+[\\w'\u2019]+){0,5}?\\s+\\b(?:crime|crimes|crimed)\\b|\\b(?:crime|crimes|crimed)\\b(?:\\s+[\\w'\u2019]+){0,5}?\\s+\\b(?:i|we|im|i'm|i\u2019m|ive|i've|i ve|i\u2019ve|i'll|i ll|ill|i\u2019ll)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "brain",
+            "injury"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:brain)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:injury|injured)\\b|\\b(?:injury|injured)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:brain)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "financial",
+            "issue"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\bfinancial\\b(?:\\s+\\b\\w+\\b){0,5}\\s+\\b(?:problem|problems|issue|issues|hassle|hassles|trouble|troubles)\\b|\\b(?:problem|problems|issue|issues|hassle|hassles|trouble|troubles)\\b(?:\\s+\\b\\w+\\b){0,5}\\s+\\bfinancial\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible|never|personal|no|not)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b",
+            "\\b(?:reopen|reopening|reopened|reopens|re-open|re-opening|re-opened|re-opens)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:account)\\b",
+            "\\b(?:reactivate|open)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:account)\\b",
+            "\\b(?:neither)\\b(?:\\s+\\w+\\b){0,2}?\\s+\\b(?:financial)\\b",
+            "\\b(?:not have|no have|don't have|dont have|don t have)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:financial)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "financial",
+            "difficulty"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:financial)\\b(?:\\s+\\b\\w+\\b){0,5}\\s+\\b(?:difficulty|difficulties)\\b|\\b(?:difficulty|difficulties)\\b(?:\\s+\\b\\w+\\b){0,5}\\s+\\b(?:financial)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b",
+            "\\b(?:reopen|reopening|reopened|reopens|re-open|re-opening|re-opened|re-opens)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:account)\\b",
+            "\\b(?:reactivate|open)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:account)\\b",
+            "\\b(?:no|not)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:financial|difficulty|difficulties|problem|problems|issue|issues|hassle|hassles|trouble|troubles)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "loan"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:loan|loans|loaning|loaned)\\b"
+        ],
+        "regex_exclusion_patterns": [
+         "\\b(?:loan)\\b(?:\\s+\\w+\\b){0,2}?\\s+\\b(?:statement|statement8.Car)\\b"
+     ]
+    },
+    {
+        "keywords": [
+            "I",
+            "poor"
+        ],
+        "max_distance": 2,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:i|we|im|i'm|i\u2019m)\\b(?:\\s+\\w+\\b){0,2}\\s+\\b(?:poor)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:poor)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:connection|service|information|signal|customerservice|customer service|fool)\\b",
+            "\\b(?:speak)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:poor)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "I",
+            "hospice"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:i|we|im|i'm|i\u2019m)\\b(?:\\s+\\w+\\b){0,5}\\s+\\b(?:hospice)\\b|\\b(?:hospice)\\b(?:\\s+\\w+\\b){0,5}\\s+\\b(?:i|we)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "skint"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\bskint\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "debt",
+            "pay"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:debt|debts)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:pay|paid)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "debt",
+            "mediation"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:debt|debts)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:mediation)\\b|\\b(?:mediation)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:debt|debts)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "gambling",
+            "debt"
+        ],
+        "max_distance": 100000,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:debt|debts)\\b(?:\\s+\\w+){0,100000}?\\s+\\b(?:gambling|gamble)\\b|\\b(?:gambling|gamble)\\b(?:\\s+\\w+){0,100000}\\s+\\b(?:debt|debts)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "card",
+            "debt"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:card|cards)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:debt|debts)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:debt)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:card)\\b",
+            "\\b(?:visa)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "debt",
+            "my",
+            "bank"
+        ],
+        "max_distance": 4,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:debt|debts)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:bank)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:debt)\\b(?:\\s+\\w+\\b){0,1}?\\s+\\b(?:card)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "bank",
+            "debt"
+        ],
+        "max_distance": 1,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:bank|banks)\\b(?:\\s+\\w+){0,1}?\\s+\\b(?:debt|debts)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:debt)\\b(?:\\s+\\w+\\b){0,2}?\\s+\\b(?:card)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "huge",
+            "debt"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:huge)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:debt|debts)\\b|\\b(?:debt|debts)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:huge)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "already",
+            "debt"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:already)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:debt|debts)\\b|\\b(?:debt|debts)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:already)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "encourage",
+            "debt"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:encourage)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:debt|debts)\\b|\\b(?:debt|debts)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:encourage)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "dementia"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:dementia)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "alcohol"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\balcohol\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:sea)\\b(?:\\s+\\w+\\b){0,4}?\\s+\\b(?:cheap)\\b",
+            "\\b(?:ontario)\\b(?:\\s+\\w+\\b){0,2}?\\s+\\b(?:alcohol)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "jump",
+            "bridge"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:jump|jumping|jumped)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:bridge)\\b|\\b(?:bridge)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:jump|jumping|jumped)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:go)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:jump)\\b",
+            "\\b(?:you)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:jump)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "throw",
+            "bridge"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:throw|threw|thrown)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:bridge)\\b|\\b(?:bridge)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:throw|threw|thrown)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "throw",
+            "salary"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:throw|threw|thrown)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:salary)\\b|\\b(?:salary)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:throw|threw|thrown)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "play",
+            "paycheck"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:paycheck|paychecks)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:play|played)\\b|\\b(?:play|played)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:paycheck|paychecks)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "lose",
+            "paycheck"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:paycheck|paychecks)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:lose|lost)\\b|\\b(?:lose|lost)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:paycheck|paychecks)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "spend",
+            "paycheck"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:paycheck|paychecks)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:spend|spent|spending)\\b|\\b(?:spend|spent|spending)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:paycheck|paychecks)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "bereavement"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\bbereavement\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "more",
+            "debt"
+        ],
+        "max_distance": 1,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:more)\\b(?:\\s+\\w+){0,1}?\\s+\\b(?:debt|debts)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "finance",
+            "debt"
+        ],
+        "max_distance": 8,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:finance)\\b(?:\\s+\\w+){0,8}?\\s+\\b(?:debt|debts)\\b|\\b(?:debt|debts)\\b(?:\\s+\\w+){0,8}?\\s+\\b(?:finance)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "hide",
+            "debt"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:hide)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:debt|debts)\\b|\\b(?:debt|debts)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:hide)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "debt",
+            "run"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:debt|debts)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:run)\\b|\\b(?:run)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:debt|debts)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "unemployed"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:unemployed)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b",
+            "\\b(?:you)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:unemployed)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "unemployment"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:unemployment)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b",
+            "\\b(?:you)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:unemployment)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "panick",
+            "attack"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:panick|panicked)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:attack|attacks|attacked)\\b|\\b(?:attack|attacks|attacked)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:panick|panicked)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "bailiff"
+        ],
+        "max_distance": 0,
+        "regex_patterns": [
+            "\\bbailiff\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "divorce"
+        ],
+        "max_distance": 0,
+        "regex_patterns": [
+            "\\b(?:divorce|divorcing|divorced)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "borrow",
+            "money"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:borrow|borrowed|borrowing)\\b(?:\\s+\\w+\\b){0,5}\\s+\\b(?:money)\\b|\\b(?:money)\\b(?:\\s+\\w+\\b){0,5}\\s+\\b(?:borrow|borrowed|borrowing)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "affect",
+            "life"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:affect|affected|affects)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:life|lives)\\b|\\b(?:life|lives)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:affect|affected|affects)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:no|not)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:affect)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "affect",
+            "financially"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:affect|affected|affects)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:financially)\\b|\\b(?:financially)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:affect|affected|affects)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "hurting",
+            "financially"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:hurting)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:financially)\\b|\\b(?:financially)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:hurting)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "impact",
+            "financially"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:impact|impacts|impacted)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:financially)\\b|\\b(?:financially)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:impact|impacts|impacted)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:no|not)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:impact|impacts|impacted)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "negatively",
+            "affect",
+            "debt"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:negatively)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:affect|affected|affects)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:debt|debts)\\b|\\b(?:negatively)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:debt|debts)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:affect|affected|affects)\\b|\\b(?:debt|debts)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:affect|affected|affects)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:negatively)\\b|\\b(?:debt|debts)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:negatively)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:affect|affected|affects)\\b|\\b(?:affect|affected|affects)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:negatively)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:debt|debts)\\b|\\b(?:affect|affected|affects)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:debt|debts)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:negatively)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "take",
+            "my",
+            "life"
+        ],
+        "max_distance": 3,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:take|took|taking|end|ended|ends)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:life|lives)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "end",
+            "my",
+            "life"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:end|ended|ends)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:my|mine|our|ours)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:life|lives)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "end",
+            "it",
+            "all"
+        ],
+        "max_distance": 4,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:end|ended|ends)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:it)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:all)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "no",
+            "want",
+            "live",
+            "anymore"
+        ],
+        "max_distance": 6,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:no|not|cant|can t|can't|can\u2019t|couldn|couldn t|couldn't|couldn\u2019t|couldnt|cldnt|dont|don t|don't|don\u2019t|wouldnt|wouldn t|wouldn't||wouldn\u2019t)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:want|wants)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:live|lives)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:anymore|any more)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "risk",
+            "my",
+            "life"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:risk|risked|risks)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:life|lives)\\b|\\b(?:risk|risked|risks)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:life|lives)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:my|mine|ours|our)\\b|\\b(?:life|lives)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:risk|risked|risks)\\b|\\b(?:life|lives)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:risk|risked|risks)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:my|mine|ours|our)\\b|\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:risk|risked|risks)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:life|lives)\\b|\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:life|lives)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:risk|risked|risks)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:never|no|not)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:risk)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "I",
+            "no",
+            "sleep"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:i|we|im|i'm|i\u2019m)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(no|not|dont|don't|don t|don\u2019t|will not|wont|wont\u2019t|won't|won t|didn't|didnt|didn t|did not|didn\u2019t|couldnt|couldn\u2019t|couldn't|couldn t|could not|couldnot|cldnt|wouldnt|wouldn t|wouldn't||wouldn\u2019t)(?:\\s+\\w+){0,5}?\\s+\\b(?:sleep|slept|sleeping)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:will|i\u2019ll|i'll)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:go|going)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:sleep|sleeping)\\b",
+            "\\b(?:go|going)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:sleep|sleeping)\\b",
+            "\\b(?:sleep|sleeping)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:soon)\\b",
+            "\\b(?:i|we)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:be|am|are|is|was|were|being|been)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:sleep|sleeping)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "starve"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:starve|starved|starving)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "bankrupt"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:bankrupt|bankrupts)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b",
+            "\\b(?:partycasino)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:bankrupt)\\b",
+            "\\b(?:u)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:bankrupt)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "my",
+            "mortgage"
+        ],
+        "max_distance": 2,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:mortgage)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b",
+            "\\b(?:mortgage)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:statement)\\b|\\b(?:statement)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:mortgage)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "asylum"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\basylum\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "hurt",
+            "myself"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:hurt|hurting|hurts)\\b(?:\\s+[\\w'\u2019]+){0,5}?\\s+\\b(?:myself|my self|me)\\b|\\b(?:myself|my self|me)\\b(?:\\s+[\\w'\u2019]+){0,5}\\s+\\b(?:hurt|hurting|hurts)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "addictive"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:addictive)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "addicting"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:addicting)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "addictively"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:addictively)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:deficient)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "addict"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:addict|addicts|addicted)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:no|not)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:addict|addicts|addicted)\\b",
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "addicted"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:addicted)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "addiction"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:addiction|addictions)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:no|not)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:addiction|addictions)\\b",
+            "\\b(?:how)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:play)\\b",
+            "\\b(?:no|not)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:financial|close|personal|correspond)\\b",
+            "\\b(?:counselor)\\b",
+            "\\b(?:fully)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsible)\\b",
+            "\\b(?:do|did|doing|done)\\b(?:\\s+\\w+\\b){0,2}?\\s+\\b(?:no|not)\\b(?:\\s+\\w+\\b){0,2}?\\s+\\b(?:say)\\b",
+            "\\b(?:re-open|re-opened|re-opening|re-opens|reopen|reopens|reopened|reopening|re open|re opens|re opened|re opening)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:account)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "coerce"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:coerce|coerced|coerces|coercing)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "wild",
+            "spend"
+        ],
+        "max_distance": 3,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(wild(?:ly)?)(?:\\s+\\w+){0,2}?\\s+\\bspend\\b|\\bspend\\b(?:\\s+\\w+){0,2}?\\s+\\b(wild(?:ly)?)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "wild",
+            "play"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(wild(?:ly)?)(?:\\s+\\w+){0,2}?\\s+\\bplay\\b|\\bplay\\b(?:\\s+\\w+){0,2}?\\s+\\b(wild(?:ly)?)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "play",
+            "salary"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(play(?:ing|s|ed)?)(?:\\s+\\w+){0,5}?\\s+\\b(?:salary|salaries)\\b|\\b(?:salary|salaries)\\b(?:\\s+\\w+){0,5}?\\s+\\b(play(?:ing|s|ed)?)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "spend",
+            "salary"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(spend(?:ing|s)?)(?:\\s+\\w+){0,5}?\\s+\\b(?:salary|salaries)\\b|\\b(?:salary|salaries)\\b(?:\\s+\\w+){0,5}?\\s+\\b(spend(?:ing|s)?)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "hang",
+            "myself"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(hang(?:ing|s|ed)?)(?:\\s+\\w+){0,5}?\\s+\\b(?:myself|my self|me)\\b|\\b(?:myself|my self|me)\\b(?:\\s+\\w+){0,5}?\\s+\\b(hang(?:ing|s|ed)?)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "harm",
+            "myself"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(harm(?:ing|s|ed)?)(?:\\s+\\w+){0,5}?\\s+\\b(?:myself|my self|me)\\b|\\b(?:myself|my self|me)\\b(?:\\s+\\w+){0,5}?\\s+\\b(harm(?:ing|s|ed)?)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,4}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "destitute"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:destitute)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "intoxicate"
+        ],
+        "max_distance": 0,
+        "regex_patterns": [
+            "\\bintoxicate\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "spend",
+            "more",
+            "I",
+            "can"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\bspend(?:ing)?(?:\\s+\\b\\w+\\b){0,2}?\\s+\\b(?:more)\\b(?:\\s+\\b\\w+\\b){0,2}?\\s+\\b(?:i|we|im|i'm|i\u2019m)\\b(?:\\s+\\b\\w+\\b){0,1}?\\s+\\b(?:can)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:dollar|)\\b",
+            "[$\u00a3\u20ac]\\d+(?:\\.\\d{2})?",
+            "\\b(?:no|not|never)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:spend)\\b",
+            "\\b(?:you)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:can)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "lose",
+            "salary"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:lose|losing|lost)\\b(?:\\s+[\\w'\u2019]+){0,5}?\\s+\\bsalary\\b|\\bsalary\\b(?:\\s+[\\w'\u2019]+){0,5}?\\s+\\b(?:lose|losing|lost)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "desperation"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\bdesperation\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:no|not)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:desperation)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "rope",
+            "neck"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:rope|ropes)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:neck|necks)\\b|\\b(?:neck|necks)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:rope|ropes)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "slit",
+            "wrist"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:slit|slits|slitting)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:wrist|wrists)\\b|\\b(?:wrist|wrists)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:slit|slits|slitting)\\b",
+            "(?:slit|slits|slitting).*?(?:wrist|wrists)|(?:wrist|wrists).*?(?:slit|slits|slitting)"
+        ]
+    },
+    {
+        "keywords": [
+            "take",
+            "my",
+            "life"
+        ],
+        "max_distance": 3,
+        "flexible_order": false,
+        " regex_patterns": [
+            "\\b(?:take|taking|took|takes)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,2}?\\b(?:life)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "my",
+            "overdose"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:overdose|over dose)\\b|\\b(?:overdose|over dose)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:my|mine|ours|our)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "tipsy"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\btipsy\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "marijuana"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\bmarijuana\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "lose",
+            "my",
+            "job"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:lose|losing|lost)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:job|jobs)\\b|\\b(?:lose|losing|lost)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:job|jobs)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:my|mine|ours|our)\\b|\\b(?:job|jobs)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:lose|losing|lost)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:my|mine|ours|our)\\b|\\b(?:job|jobs)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:lose|losing|lost)\\b|\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:job|jobs)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:lose|losing|lost)\\b|\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:lose|losing|lost)\\b(?:\\s+\\w+){0,3}\\s+\\b(?:job|jobs)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "lose",
+            "my",
+            "house"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:lose|losing|lost)\\b(?:\\s+\\b\\w+\\b){0,3}\\s+\\b(?:my|mine|ours|our)\\b(?:\\s+\\b\\w+\\b){0,3}\\s+\\b(?:house|home)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "can",
+            "not",
+            "feed"
+        ],
+        "max_distance": 4,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:can|cant)\\b(?:\\s+\\w+\\b){0,2}\\s+\\b(?:no|not)\\b(?:\\s+\\w+\\b){0,2}\\s+\\b(?:feed|feeding)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "my",
+            "children"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+\\b){0,5}\\s+\\b(?:child|children|kid|kids)\\b|\\b(?:child|children|kid|kids)\\b(?:\\s+\\w+\\b){0,5}\\s+\\b(?:my|mine|ours|our)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "in",
+            "despair"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:in)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:despair)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "spend",
+            "my",
+            "wage"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:spend|spent)\\b(?:\\s+\\w+\\b){0,2}\\s+\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+\\b){0,2}\\s+\\b(?:wage|wages)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "destroy",
+            "everything"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:destroy|destroying|destroyed)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:everything)\\b|\\b(?:everything)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:destroy|destroying|destroyed)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "evict"
+        ],
+        "max_distance": 0,
+        "regex_patterns": [
+            "\\bevict(?:ed|ing)?\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:evict)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:myself|my self|message)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "lose",
+            "my",
+            "family"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:lose|losing|lost)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:family)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "pay",
+            "pension"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:pay|paid|pays)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:pension)\\b|\\b(?:pension)\\b(?:\\s+\\w+){0,5}\\s+\\b(?:pay|paid|pays)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "go",
+            "hungry"
+        ],
+        "max_distance": 2,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:go|goes|going)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:hungry)\\b|\\b(?:hungry)\\b(?:\\s+\\w+){0,2}\\s+\\b(?:go|goes|going)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "hungry",
+            "family"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:hungry)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:family|child|son|kid|daughter)\\b|\\b(?:family|child|son|kid|daughter)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:hungry)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "violent"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:violent|violence)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "my",
+            "family",
+            "need"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:family)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:need|needs)\\b|\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:need|needs)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:family)\\b|\\b(?:family)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:need|needs)\\b|\\b(?:family)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:need|needs)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:my|mine|ours|our)\\b|\\b(?:need|needs)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:family)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:my|mine|ours|our)\\b|\\b(?:need|needs)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,3}?\\s+\\b(?:family)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:change)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:name)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "tapout"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:tapout|tap out|tapped out|tapping out)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "insolvent"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:insolvent)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "insolvency"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:insolvency)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "financial",
+            "control"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:financial)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:control|controls|controlled)\\b|\\b(?:control|controls|controlled)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:financial)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:setting|policy|find)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:financial)\\b",
+            "\\b(?:maintain)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:control)\\b",
+            "\\b(?:financial)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:balance)\\b",
+            "\\b(?:you)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:lose)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "compromise",
+            "income"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:compromise|compromised)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:income|incomes)\\b|\\b(?:income|incomes)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:compromise|compromised)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "ocd"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:ocd)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "bipolar"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:bipolar|bi polar|bi-polar|bi_polar)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "sexual",
+            "abuse"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:sexual|sex)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:abuse|abused|abusing)\\b|\\b(?:abuse|abused|abusing)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:sexual|sex)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "psychologically"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\bpsychologically\\b",
+            "\\bpsychically\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:psychologically)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:ok)\\b",
+            "\\b(?:you)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:psychologically)\\b",
+            "\\b(?:good)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:psychologically)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "psychologist"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:psychologist)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "psychiatrist"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:psychiatrist)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "health",
+            "reason"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:health|healthy)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:reason|reasons)\\b|\\b(?:reason|reasons)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:health|healthy)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "insomnia"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:insomnia)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "schizophrenia"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:schizophrenia)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:irresponsible)\\b",
+            "\\b(?:care)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:responsibility)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "compulsiveness"
+        ],
+        "max_distance": 0,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\bcompulsiveness\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "delete",
+            "account",
+            "debt"
+        ],
+        "max_distance": 100000,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:delete|deletes|deleted)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:account)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:debt|debts)\\b|\\b(?:delete|deletes|deleted)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:debt|debts)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:account)\\b|\\b(?:account)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:debt|debts)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:delete|deletes|deleted)\\b|\\b(?:account)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:delete|deletes|deleted)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:debt|debts)\\b|\\b(?:debt|debts)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:delete|deletes|deleted)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:account)\\b|\\b(?:debt|debts)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:account)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:delete|deletes|deleted)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "much",
+            "debt"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:much)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:debt|debts)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "too much",
+            "debt"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:too much|to much)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:debt|debts)\\b|\\b(?:debt|debts)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:too much|to much)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "close",
+            "account",
+            "debt"
+        ],
+        "max_distance": 100000,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:close|closes|closed)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:account)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:debt|debts)\\b|\\b(?:close|closes|closed)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:debt|debts)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:account)\\b|\\b(?:account)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:debt|debts)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:close|closes|closed)\\b|\\b(?:account)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:close|closes|closed)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:debt|debts)\\b|\\b(?:debt|debts)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:close|closes|closed)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:account)\\b|\\b(?:debt|debts)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:account)\\b(?:\\s+\\w+){0,10000}?\\s+\\b(?:close|closes|closed)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:debt)\\b(?:\\s+\\w+\\b){0,1}?\\s+\\b(?:card|cards)\\b",
+            "\\b(?:visa)\\b(?:\\s+\\w+\\b){0,1}?\\s+\\b(?:debt|debts)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "full",
+            "debt"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:full)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:debt|debts)\\b|\\b(?:debt|debts)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:full)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "bad",
+            "debt"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:bad)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:debt|debts)\\b|\\b(?:debt|debts)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:bad)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "large",
+            "debt"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:large)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:debt|debts)\\b|\\b(?:debt|debts)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:large)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "I",
+            "indebted"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:i|we|im|i'm|i\u2019m)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:indebted)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:indebted)\\b(?:\\s+\\w+\\b){0,3}?\\s+\\b(?:you)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "no",
+            "control",
+            "gamble"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:no|not|cant|can t|can't|can\u2019t|couldn|couldn t|couldn't|couldn\u2019t|couldnt|cldnt|dont|don t|don't|don\u2019t|wouldnt|wouldn t|wouldn't||wouldn\u2019t)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:control)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:gamble|gambling)\\b|\\b(?:gamble|gambling)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:control)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:no|not)\\b|\\b(?:control)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:no|not)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:gamble|gambling)\\b|\\b(?:control)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:gamble|gambling)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:no|not)\\b|\\b(?:gamble|gambling)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:no|not)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:control)\\b|\\b(?:no|not)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:gamble|gambling)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:control)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "drink",
+            "little"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:drink|drinks|drank)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:little)\\b|\\b(?:little)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:drink|drinks|drank)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "I",
+            "disturb"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:i|we|im|i'm|i\u2019m)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:disturbed)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "concentrate",
+            "work"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:concentrate|concentrated)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:work|worked)\\b|\\b(?:work|worked)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:concentrate|concentrated)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "out",
+            "street"
+        ],
+        "max_distance": 5,
+        "flexible_order": false,
+        "regex_patterns": [
+            "\\b(?:out)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:street|streets)\\b"
+        ],
+        "regex_exclusion_patterns": [
+            "\\b(?:write)\\b(?:\\s+\\w+\\b){0,6}?\\s+\\b(?:street)\\b",
+            "\\b(?:street)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:name|address)\\b",
+            "\\b(?:spell)\\b(?:\\s+\\w+\\b){0,5}?\\s+\\b(?:street)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "jeopardy",
+            "family"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:jeopardy)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:family)\\b|\\b(?:family)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:jeopardy)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "uncontrollable",
+            "gambling"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:uncontrollable)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:gambling)\\b|\\b(?:gambling)\\b(?:\\s+\\w+){0,5}?\\s+\\b(?:uncontrollable)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "stop",
+            "spending",
+            "me"
+        ],
+        "max_distance": 3,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:stop)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:spend|spending)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:me|us)\\b|\\b(?:stop)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:me|us)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:spend|spending)\\b|\\b(?:me|us)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:spend|spending)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:stop)\\b|\\b(?:me|us)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:stop)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:spend|spending)\\b|\\b(?:spend|spending)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:stop)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:me|us)\\b|\\b(?:spend|spending)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:me|us)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:stop)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "sell",
+            "my",
+            "stuff"
+        ],
+        "max_distance": 3,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:sell)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:stuff)\\b|\\b(?:sell)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:stuff)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:my|mine|ours|our)\\b|\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:sell)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:stuff)\\b|\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:stuff)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:sell)\\b|\\b(?:stuff)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:my|mine|ours|our)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:sell)\\b|\\b(?:stuff)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:sell)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:my|mine|ours|our)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "who",
+            "is",
+            "broke"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:who)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:is)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:broke)\\b|\\b(?:who)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:broke)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:is)\\b|\\b(?:is)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:who)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:broke)\\b|\\b(?:is)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:broke)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:who)\\b|\\b(?:broke)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:is)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:who)\\b|\\b(?:broke)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:who)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:is)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "have",
+            "nothing",
+            "leave",
+            "debt"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:have)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:nothing)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:leave)\\b(?:\\s+\\w+){0,100000}?\\s+\\b(?:debt|debts)\\b|\\b(?:have)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:leave)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:nothing)\\b(?:\\s+\\w+){0,100000}?\\s+\\b(?:debt|debts)\\b|\\b(?:nothing)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:have)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:leave)\\b(?:\\s+\\w+){0,100000}?\\s+\\b(?:debt|debts)\\b|\\b(?:nothing)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:leave)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:have)\\b(?:\\s+\\w+){0,100000}?\\s+\\b(?:debt|debts)\\b|\\b(?:leave)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:have)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:nothing)\\b(?:\\s+\\w+){0,100000}?\\s+\\b(?:debt|debts)\\b|\\b(?:leave)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:nothing)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:have)\\b(?:\\s+\\w+){0,100000}?\\s+\\b(?:debt|debts)\\b",
+            "\\b(?:debt|debts)\\b(?:\\s+\\w+){0,100000}?\\s+\\b(?:have)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:nothing)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:leave)\\b|\\b(?:debt|debts)\\b(?:\\s+\\w+){0,100000}?\\s+\\b(?:have)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:leave)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:nothing)\\b|\\b(?:debt|debts)\\b(?:\\s+\\w+){0,100000}?\\s+\\b(?:nothing)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:have)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:leave)\\b|\\b(?:debt|debts)\\b(?:\\s+\\w+){0,100000}?\\s+\\b(?:nothing)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:leave)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:have)\\b|\\b(?:debt|debts)\\b(?:\\s+\\w+){0,100000}?\\s+\\b(?:leave)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:have)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:nothing)\\b|\\b(?:debt|debts)\\b(?:\\s+\\w+){0,100000}?\\s+\\b(?:leave)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:nothing)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:have)\\b"
+        ]
+    },
+    {
+        "keywords": [
+            "debt",
+            "through",
+            "ear"
+        ],
+        "max_distance": 5,
+        "flexible_order": true,
+        "regex_patterns": [
+            "\\b(?:debt|debts)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:through)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:ear|ears)\\b|\\b(?:debt|debts)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:ear|ears)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:through)\\b|\\b(?:ear|ears)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:debt|debts)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:through)\\b|\\b(?:ear|ears)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:through)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:debt|debts)\\b|\\b(?:through)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:debt|debts)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:ear|ears)\\b|\\b(?:through)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:ear|ears)\\b(?:\\s+\\w+){0,2}?\\s+\\b(?:debt|debts)\\b"
+        ]
+    }
+ ]

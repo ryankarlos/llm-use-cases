@@ -1,0 +1,25 @@
+
+.*.sw?
+.idea
+terragrunt.iml
+vendor
+.terraform
+.vscode
+*.tfstate
+*.tfstate.backup
+*.out
+.terragrunt-cache
+.bundle
+.ruby-version
+.terraform.lock.hcl
+.DS_Store
+mocks/
+.go-version
+.terragrunt-stack
+.devcontainer.json
+.cursor/
+
+# lambda_function.zip
+import.tf
+venv
+*.pem

@@ -1,0 +1,31 @@
+digraph INFRA {
+  node [ color = "black", fillcolor = "#E6E6E6", height =1, style = "filled,bold,rounded", fontname = "Arial" ];
+  "route_53_records" [ label = "route_53_records
+(AWS::Route53::RecordSet)", shape =rectangle, fillcolor = "#E78F81" ];
+  "lambda" [ label = "lambda
+(AWS::Lambda::Function)", shape =rectangle, fillcolor = "#B7E0FF" ];
+  "bedrock_endpoint" [ label = "bedrock_endpoint
+(AWS::EC2::VPCEndpoint)", shape =rectangle, fillcolor = "#E78F81" ];
+  "load_balancer_with_ip_target" [ label = "load_balancer_with_ip_target
+(AWS::ElasticLoadBalancingV2::LoadBalancer)", shape =rectangle, fillcolor = "#E78F81" ];
+  "acm_cert" [ label = "acm_cert
+(AWS::CertificateManager::Certificate)", shape =rectangle ];
+  "api_gateway" [ label = "api_gateway
+(AWS::ApiGateway::RestApi)", shape =rectangle, fillcolor = "#E78F81" ];
+  "s3_logs" [ label = "s3_logs
+(AWS::S3::Bucket)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "s3_trust_store" [ label = "s3_trust_store
+(AWS::S3::Bucket)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "s3_python_packages" [ label = "s3_python_packages
+(AWS::S3::Bucket)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "api_gateway_model" [ label = "api_gateway_model
+(AWS::ApiGateway::Model)", shape =rectangle, fillcolor = "#E78F81" ];
+  "route_53_records" -> "load_balancer_with_ip_target";
+  "load_balancer_with_ip_target" -> "acm_cert";
+  "load_balancer_with_ip_target" -> "api_gateway";
+  "load_balancer_with_ip_target" -> "s3_trust_store";
+  "acm_cert" -> "route_53_records";
+  "api_gateway" -> "lambda";
+  "api_gateway" -> "acm_cert";
+  "api_gateway_model" -> "api_gateway";
+}

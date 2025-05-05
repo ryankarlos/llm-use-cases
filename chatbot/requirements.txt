@@ -1,0 +1,4 @@
+checkov
+pre-commit
+black
+ruff
