@@ -17,14 +17,8 @@ The application consists of:
 
 ## Features
 
-- Multi-language support including:
-  - German
-  - Brazilian Portuguese
-  - Spanish
-  - Greek
-  - English
+- Multi-language support:
 - Real-time translation using Amazon Bedrock models (Titan and Mistral)
-- Fallback to Amazon Translate for longer texts
 - Guardrails
 - Support for chat conversations
 - Name anonymization
@@ -42,86 +36,21 @@ The infrastructure is managed with Terraform and includes:
 - VPC endpoints for AWS services
 - S3 buckets for various storage needs
 
-## Configuration
-
-The application uses several configuration files:
-
-- `rd_config.ini` - Core application settings
-- `rd_rules.json` - Content flagging rules
-- Environment-specific backend configurations
-
-### Translation Settings
-
-The application supports chunked translation with configurable thresholds:
-- Default chunk size threshold
-- Language-specific thresholds for Greek and Portuguese
-- Configurable worker pool size for parallel processing
-
-### Content Flagging
-
-Rules for content flagging are defined in `rd_rules.json` and cover various categories including:
-- Financial concerns
-- Mental health
-- Personal wellbeing
-- Behavioral patterns
-
-
 ## Security
 
 The application implements several security measures:
 
 - Private API Gateway endpoints
-- Mutual TLS authentication
 - Internal load balancer
 - VPC isolation
 - Request validation
 - Input sanitization
 
-## Development
-
-The project structure includes:
-
-```
-.
-├── docs
-│   ├── infra.dot
-│   └── infra.svg
-├── README.md
-├── requirements.txt
-└── terraform
-    └── products
-        └── redflag
-            ├── backend.tf
-            ├── code
-            │   └── lambda
-            │       ├── redflag_lambda_function
-            │       │   ├── lambda_function.py
-            │       │   ├── rd_config.ini
-            │       │   ├── rd_config.py
-            │       │   ├── rd_rules.json
-            │       │   ├── rd_utils.py
-            │       │   └── translate_utils.py
-            │       └── trust_store_lambda
-            │           └── lambda_function.py
-            ├── data.tf
-            ├── main.tf
-            └── variables.tf
-```
-
-
-
-## Deployment from Local
-
-The application supports deployment to multiple environments:
-- Development (`environments/dev`)
-- Production (`environments/prod`)
-
-Each environment uses its own backend configuration for state management.
 
 ### Prerequisites
 - Terraform installed https://developer.hashicorp.com/terraform/install
 - Terragrunt installed https://terragrunt.gruntwork.io/docs/getting-started/quick-start/
-- AWS credentials configured for target environment via SSO in cli
+- AWS credentials configured for your account.
 - Pre-commit installed (for code quality checks)
 
 
@@ -153,11 +82,10 @@ pre-commit run --all-files
 
 ### Development Environment
 
-To deploy to the development environment:
 
 ```bash
 # Change to the development environment directory for your target region
-cd terragrunt/dev/eu-west-1/redflag
+cd translation/terragrunt
 
 # Plan changes
 terragrunt plan
@@ -165,75 +93,3 @@ terragrunt plan
 # Apply changes
 terragrunt apply
 ```
-
-
-### Production Environment
-
-To deploy to the production environment (requires tagged commit):
-
-```bash
-# Change to the production environment directory for your target region
-cd terragrunt/prod/eu-west-1/redflag
-
-# Plan changes
-terragrunt plan
-
-# Apply changes
-terragrunt apply
-```
-
-Each environment has its own `terragrunt.hcl` file that includes:
-- Backend configuration
-- Environment-specific variables
-- Provider settings
-
-To view the plan for a specific environment with variables:
-
-```bash
-# Change to the appropriate environment and region directory
-cd terragrunt/<environment>/<region>/redflag
-
-# Run plan with environment-specific variables
-terragrunt plan -var-file=<env>.tfvars
-```
-
-## Deployment Via GitLab CI-CD
-
-The project includes a GitLab CI/CD pipeline for automated deployments. The pipeline consists of the following stages:
-
-### Pipeline Stages
-
-1. **Validate**: Verifies AWS account ID matches the runner's configuration
-2. **Dev Plan**: Runs Terragrunt plan for development environment
-3. **Prod Plan**: Runs Terragrunt plan for production environment
-4. **Dev Apply**: Applies changes to development environment (manual trigger)
-5. **Prod Apply**: Applies changes to production environment (manual trigger, requires tagged commit)
-
-### Triggering Deployments
-
-- Development deployments:
-  - Automatically triggered on merge requests
-  - Can be manually triggered from the GitLab pipeline interface
-
-- Production deployments:
-  - Requires a tagged commit
-  - Must be manually triggered from the GitLab pipeline interface
-  - Only runs on the main branch
-
-### Pipeline Configuration
-
-The pipeline uses environment-specific runners:
-- Development: `dsai-redword-flagger-dev-runner`
-- Production: `dsai-redword-flagger-prod-runner`
-
-To deploy using the pipeline:
-
-1. For development:
-   - Create a merge request
-   - Pipeline will automatically run plans
-   - Manually trigger the "Dev Apply" job when ready
-
-2. For production:
-   - Create a git tag on the main branch
-   - Push the tag to trigger the pipeline
-   - Manually trigger the "Prod Apply" job when ready
