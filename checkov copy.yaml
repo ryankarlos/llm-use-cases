@@ -1,6 +1,0 @@
-skip-check:
-  - CKV_TF_1
-  - CKV_TF_2
-  - CKV_DOCKER_2
-  - CKV_DOCKER_3
-  - CKV_SECRET_6

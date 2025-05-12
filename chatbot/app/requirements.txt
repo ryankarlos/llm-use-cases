@@ -1,6 +1,0 @@
-streamlit
-boto3
-streamlit-cognito-auth
-pandas
-PyPDF2
-python-docx
