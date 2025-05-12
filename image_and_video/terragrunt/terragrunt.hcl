@@ -37,4 +37,6 @@ inputs = {
   task_execution_role_name = "TaskExecutionRole"
   task_role_name = "TaskRole"
   security_group_id = "sg-048d64314bdae5e24"
+  vpc_id = "vpc-05c7628a7a70e7e0f"
+  subnet_ids = ["subnet-04fd3ba1aa9d56cb0", "subnet-0e165015f85692b36"]
 }

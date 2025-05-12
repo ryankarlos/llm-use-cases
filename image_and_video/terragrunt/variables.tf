@@ -121,3 +121,13 @@ variable "security_group_id" {
   description = "security_group_id"
   type        = string
 }
+
+variable "subnet_ids" {
+  description = "subnet_ids"
+  type        = list(string)
+}
+
+variable "vpc_id" {
+  description = "vpc_id"
+  type        = string
+}

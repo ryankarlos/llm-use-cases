@@ -16,7 +16,7 @@ Built with Streamlit and deployed on AWS ECS, Canvas Video offers a user-friendl
 ├── app/                           # Core application code
 │   ├── canvas.py                 # Amazon Canvas integration for image generation
 │   ├── video.py                  # Video conversion functionality
-│   ├── streamlit_app.py          # Main Streamlit application interface
+│   ├── main.py          # Main Streamlit application interface
 │   ├── utils.py                  # Utility functions
 │   └── requirements.txt          # Python dependencies for the application
 ├── terraform/                     # Infrastructure as Code
@@ -66,7 +66,7 @@ export AWS_REGION="your-aws-region"
 
 # Run the application locally
 cd app
-streamlit run streamlit_app.py
+streamlit run main.py
 ```
 
 #### Docker Deployment

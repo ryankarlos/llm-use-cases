@@ -1,9 +1,5 @@
 
 
-locals {
-   az_subnet_ids = data.aws_subnets.default_vpc_subnets.ids
-}
-
 
 module "route_53_records" {
   source           = "github.com/ryankarlos/terraform_modules.git//aws/route_53/alias_record"
@@ -13,10 +9,21 @@ module "route_53_records" {
   alias_zone_id    = module.load_balancer.zone_id
 }
 
+
+
+# Add the CNAME record to Route 53
+# resource "aws_route53_record" "my_cname_record" {
+#   name    = "${var.subdomain}.${var.hosted_zone_name}"
+#   type    = "CNAME"
+#   records = [aws_acm_certificate.cert.resource_record_value]
+#   zone_id = module.route_53_records.zone_id
+
+# }
+
 module "load_balancer" {
   source                       = "github.com/ryankarlos/terraform_modules.git//aws/load_balancer/application/ip_target"
-  vpc_id                       = aws_vpc.main.id
-  subnet_ids                   = local.az_subnet_ids
+  vpc_id                       = var.vpc_id
+  subnet_ids                   = var.subnet_ids
   certificate_arn              = aws_acm_certificate.cert.arn
   security_group_id            = var.security_group_id
   alb_name                     = var.alb_name
@@ -32,7 +39,7 @@ module "ecs" {
   cluster_name                    = var.cluster_name
   service_name                    = var.service_name
   container_name                  = var.container_name
-  subnet_ids                      = local.az_subnet_ids
+  subnet_ids                      = var.subnet_ids
   desired_count                   = var.desired_count
   min_capacity                    = var.min_capacity
   max_capacity                    = var.max_capacity
@@ -84,14 +91,6 @@ module "ecs" {
   scaling_type     = "step"
   container_port   = var.container_port
   target_group_arn = module.load_balancer.target_group_arn
-}
-
-module "bedrock_endpoint" {
-  source                         = "github.com/ryankarlos/terraform_modules.git//aws/bedrock"
-  vpc_id                         = aws_vpc.main.id
-  vpc_endpoint_security_group_id = var.security_group_id
-  endpoint_subnet_ids            = local.az_subnet_ids
-  tag                            = { name : "bedrock-vpce" }
 }
 
 
@@ -157,6 +156,7 @@ resource "awscc_bedrock_guardrail" "example" {
 
 resource "aws_acm_certificate" "cert" {
   domain_name       = "${var.subdomain}.${var.hosted_zone_name}"
+  validation_method = "DNS"
 
   lifecycle {
     create_before_destroy = true
