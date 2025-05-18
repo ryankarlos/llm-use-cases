@@ -16,6 +16,9 @@ remote_state {
 locals {
   account_id =  get_aws_account_id()
   region = "us-east-1"
+  # Add username and email for Cognito user
+  username = "ryan"
+  email = "ryankarlos@gmail.com"
 }
 
 inputs = {
@@ -39,4 +42,9 @@ inputs = {
   security_group_id = "sg-048d64314bdae5e24"
   vpc_id = "vpc-05c7628a7a70e7e0f"
   subnet_ids = ["subnet-04fd3ba1aa9d56cb0", "subnet-0e165015f85692b36"]
+  # Add Cognito user variables
+  cognito_username = local.username
+  cognito_email = local.email
+  cognito_generate_password = true
+  cognito_send_email = true
 }

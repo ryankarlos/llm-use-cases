@@ -2,3 +2,7 @@ checkov
 pre-commit
 black
 ruff
+pytest
+pytest-mock
+pytest-cov
+moto

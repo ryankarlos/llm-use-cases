@@ -1,4 +1,3 @@
-
 variable "image_uri" {
   description = "docker image uri for ECS"
   type        = string
@@ -130,4 +129,27 @@ variable "subnet_ids" {
 variable "vpc_id" {
   description = "vpc_id"
   type        = string
+}
+
+# Add new variables for Cognito user
+variable "cognito_username" {
+  description = "Username for Cognito user"
+  type        = string
+}
+
+variable "cognito_email" {
+  description = "Email for Cognito user"
+  type        = string
+}
+
+variable "cognito_generate_password" {
+  description = "Whether to generate a password for the Cognito user"
+  type        = bool
+  default     = true
+}
+
+variable "cognito_send_email" {
+  description = "Whether to send an email to the Cognito user"
+  type        = bool
+  default     = true
 }

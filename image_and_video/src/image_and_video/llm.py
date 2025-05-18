@@ -6,7 +6,7 @@ import logging
 import base64
 from abc import ABC, abstractmethod
 from .sports_classifier import SportsImageClassifier
-from .config import AWS_REGION, S3_BUCKET, POLL_INTERVAL, DEFAULT_VIDEO_CONFIG, DEFAULT_IMAGE_CONFIG
+from .config import AWS_REGION, S3_BUCKET, POLL_INTERVAL, DEFAULT_VIDEO_CONFIG, DEFAULT_IMAGE_CONFIG, NOVA_REEL_BASE_PROMPT
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -116,9 +116,18 @@ class NovaReelProcessor(AIModelProcessor):
         self.poll_interval = poll_interval
         self.s3_service = S3Service()
         self.sports_classifier = SportsImageClassifier()
+    
+    def enhance_prompt(self, marketing_prompt, brand=None, sport_type=None):
+        """Enhance the marketing prompt with the base Nova Reel prompt"""
+        enhanced_prompt = NOVA_REEL_BASE_PROMPT.strip() + " " + marketing_prompt
         
-        # System prompt for sports marketing
-        self.system_prompt = "You are SportVision AI, a premier sports marketing agency specializing in creating dynamic sports content."
+        if brand:
+            enhanced_prompt += f" for {brand}"
+            
+        if sport_type:
+            enhanced_prompt += f" in the context of {sport_type}"
+            
+        return enhanced_prompt
     
     def process(self, image_bytes, prompt, status_callback=None, video_config=None):
         """Generate sports marketing video using Amazon Nova Reel"""
@@ -134,9 +143,6 @@ class NovaReelProcessor(AIModelProcessor):
             # Convert image bytes to base64
             image_base64 = base64.b64encode(image_bytes).decode('utf-8')
             
-            # Enhance the prompt with sports marketing context
-            enhanced_prompt = f"{self.system_prompt} {prompt}"
-            
             # Use default config if none provided
             if video_config is None:
                 video_config = DEFAULT_VIDEO_CONFIG
@@ -144,7 +150,7 @@ class NovaReelProcessor(AIModelProcessor):
             model_input = {
                 "taskType": "TEXT_VIDEO",
                 "textToVideoParams": {
-                    "text": enhanced_prompt,
+                    "text": prompt,
                     "images": [
                         {
                             "format": "png",
@@ -163,7 +169,7 @@ class NovaReelProcessor(AIModelProcessor):
                 modelInput=model_input,
                 outputDataConfig={
                     "s3OutputDataConfig": {
-                        "s3Uri": f"s3://{self.s3_bucket}"
+                        "s3Uri": f"s3://{self.s3_bucket}",
                     }
                 },
             )

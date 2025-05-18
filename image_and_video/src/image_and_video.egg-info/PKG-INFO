@@ -1,3 +1,24 @@
+Metadata-Version: 2.4
+Name: image_and_video
+Version: 0.1.0
+Summary: Image and video processing application
+Author: Project Author
+License: MIT
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: streamlit>=1.22.0
+Requires-Dist: Pillow>=9.0.0
+Requires-Dist: boto3>=1.26.0
+Requires-Dist: numpy>=1.20.0
+Provides-Extra: dev
+Requires-Dist: checkov; extra == "dev"
+Requires-Dist: pre-commit; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Requires-Dist: ruff; extra == "dev"
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: pytest-mock; extra == "dev"
+Requires-Dist: pytest-cov; extra == "dev"
+
 # Sports Marketing Video Generator
 
 A Streamlit application that generates sports marketing videos using AWS Bedrock AI models.

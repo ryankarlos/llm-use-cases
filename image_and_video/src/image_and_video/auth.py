@@ -1,13 +1,9 @@
 """Authentication module for the Sports Marketing Video Generator"""
 import streamlit as st
-from .config import COGNITO_ENABLED, COGNITO_USER_POOL_ID, COGNITO_APP_CLIENT_ID, COGNITO_DOMAIN
+import os
 
 def check_authentication():
     """Check if user is authenticated or if authentication is disabled"""
-    if not COGNITO_ENABLED:
-        # Demo mode - no authentication required
-        st.sidebar.warning("⚠️ Running in demo mode (no authentication)")
-        return True
     
     try:
         # Import here to avoid errors if package is not installed
@@ -15,9 +11,9 @@ def check_authentication():
         
         # Initialize Cognito authenticator
         authenticator = CognitoAuthenticator(
-            cognito_user_pool_id=COGNITO_USER_POOL_ID,
-            cognito_app_client_id=COGNITO_APP_CLIENT_ID,
-            cognito_domain=COGNITO_DOMAIN
+            cognito_user_pool_id=os.environ["COGNITO_USER_POOL_ID"],
+            cognito_app_client_id=os.environ["COGNITO_APP_CLIENT_ID"],
+            cognito_domain=os.environ["COGNITO_DOMAIN"]
         )
         
         # Check if user is authenticated

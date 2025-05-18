@@ -1,6 +1,5 @@
 
 
-
 module "route_53_records" {
   source           = "github.com/ryankarlos/terraform_modules.git//aws/route_53/alias_record"
   hosted_zone_name = var.hosted_zone_name
@@ -124,6 +123,22 @@ resource "aws_cognito_user_pool_client" "client" {
   user_pool_id    = aws_cognito_user_pool.user_pool.id
 }
 
+# Add Cognito user
+resource "aws_cognito_user" "user" {
+  user_pool_id = aws_cognito_user_pool.user_pool.id
+  username     = var.cognito_username
+  
+  attributes = {
+    email          = var.cognito_email
+    email_verified = true
+  }
+  
+  enabled = true
+  
+  message_action = var.cognito_send_email ? "SEND" : "SUPPRESS"
+  
+  temporary_password = var.cognito_generate_password ? null : "ChangeMe123!"
+}
 
 resource "awscc_bedrock_guardrail" "example" {
   name                      = "example_guardrail"
