@@ -8,6 +8,7 @@ from PIL import Image
 import io
 import requests
 import logging
+import numpy as np
 from botocore.exceptions import ClientError
 from abc import ABC, abstractmethod
 
@@ -43,8 +44,48 @@ class AIModelProcessor(ABC):
         pass
 
 
+class SportsImageClassifier:
+    """Classifier to determine if an image is sports-related"""
+    
+    def __init__(self):
+        # Sports-related keywords for image analysis
+        self.sports_keywords = [
+            "sports", "athlete", "game", "match", "competition", "team", 
+            "stadium", "field", "court", "ball", "player", "race", "tournament",
+            "basketball", "football", "soccer", "baseball", "tennis", "golf",
+            "hockey", "rugby", "volleyball", "swimming", "track", "fitness",
+            "running", "cycling", "boxing", "martial arts", "olympics"
+        ]
+        
+    def is_sports_image(self, image_bytes):
+        """Determine if the image is sports-related using Amazon Rekognition"""
+        try:
+            rekognition = boto3.client('rekognition')
+            response = rekognition.detect_labels(Image={'Bytes': image_bytes})
+            
+            # Extract labels from the response
+            labels = [label['Name'].lower() for label in response['Labels']]
+            
+            # Check if any sports keywords are in the labels
+            for keyword in self.sports_keywords:
+                if keyword.lower() in labels:
+                    return True, labels
+                    
+            # Check for confidence scores on sports-related activities
+            for label in response['Labels']:
+                if any(keyword.lower() in label['Name'].lower() for keyword in self.sports_keywords):
+                    if label['Confidence'] > 70:
+                        return True, labels
+            
+            return False, labels
+            
+        except Exception as e:
+            logger.error(f"Error in sports image classification: {str(e)}")
+            return False, []
+
+
 class NovaCanvasProcessor(AIModelProcessor):
-    """Processor for Nova Canvas operations"""
+    """Processor for Nova Canvas operations with sports marketing focus"""
     
     def __init__(self):
         self.bedrock_runtime = boto3.client(
@@ -53,12 +94,47 @@ class NovaCanvasProcessor(AIModelProcessor):
         )
         self.accept = "application/json"
         self.content_type = "application/json"
+        self.sports_classifier = SportsImageClassifier()
+        
+        # Sports marketing context for enhancing prompts
+        self.sports_context = {
+            "general": "dynamic sports marketing advertisement with high energy and motion",
+            "basketball": "basketball marketing with dynamic action shots, team spirit, and excitement",
+            "football": "football marketing with team energy, passionate fans, and athletic prowess",
+            "soccer": "soccer marketing with global appeal, skill showcase, and fan excitement",
+            "baseball": "baseball marketing with tradition, precision, and team celebration",
+            "tennis": "tennis marketing with precision, focus, and competitive spirit",
+            "golf": "golf marketing with precision, concentration, and scenic courses",
+            "fitness": "fitness marketing with motivation, transformation, and healthy lifestyle"
+        }
+    
+    def enhance_prompt_with_sports_context(self, prompt, labels):
+        """Enhance the prompt with sports-specific marketing context"""
+        # Determine which sport context to use based on detected labels
+        sport_context = self.sports_context["general"]
+        for sport in self.sports_context:
+            if sport != "general" and sport in str(labels).lower():
+                sport_context = self.sports_context[sport]
+                break
+                
+        # Enhance the prompt with sports marketing context
+        enhanced_prompt = f"{prompt}. Create a {sport_context}. Include dynamic motion, brand visibility, and emotional connection."
+        return enhanced_prompt
     
     def process(self, image_bytes, negative_prompt, main_prompt, mask_prompt, operation_type, config=None):
-        """Process image using Amazon Nova Canvas for inpainting or outpainting"""
+        """Process image using Amazon Nova Canvas for inpainting or outpainting with sports focus"""
         try:
+            # Check if the image is sports-related
+            is_sports, labels = self.sports_classifier.is_sports_image(image_bytes)
+            
+            if not is_sports:
+                return "NOT_SPORTS_IMAGE"
+                
             # Convert image bytes to base64
             image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+            
+            # Enhance the prompt with sports marketing context
+            enhanced_prompt = self.enhance_prompt_with_sports_context(main_prompt, labels)
             
             # Use default config if none provided
             if config is None:
@@ -78,14 +154,14 @@ class NovaCanvasProcessor(AIModelProcessor):
             # Add the appropriate parameters based on operation type
             if operation_type == "INPAINTING":
                 body["inPaintingParams"] = {
-                    "text": main_prompt,
+                    "text": enhanced_prompt,
                     "maskPrompt": mask_prompt,
                     "negativeText": negative_prompt,
                     "image": image_base64,
                 }
             elif operation_type == "OUTPAINTING":
                 body["outPaintingParams"] = {
-                    "text": main_prompt,
+                    "text": enhanced_prompt,
                     "maskPrompt": mask_prompt,
                     "negativeText": negative_prompt,
                     "image": image_base64,
@@ -109,7 +185,7 @@ class NovaCanvasProcessor(AIModelProcessor):
 
 
 class NovaReelProcessor(AIModelProcessor):
-    """Processor for Nova Reel operations"""
+    """Processor for Nova Reel operations with sports marketing focus"""
     
     def __init__(self, s3_bucket="nova-reel-videos-demo", poll_interval=30):
         self.bedrock_runtime = boto3.client(
@@ -119,12 +195,49 @@ class NovaReelProcessor(AIModelProcessor):
         self.s3_bucket = s3_bucket
         self.poll_interval = poll_interval
         self.s3_service = S3Service()
+        self.sports_classifier = SportsImageClassifier()
+        
+        # Sports marketing video templates
+        self.sports_video_templates = {
+            "general": "Create a dynamic sports marketing video with high energy motion, brand visibility, and emotional connection to fans",
+            "basketball": "Create a basketball marketing video with dynamic action shots, players making impressive moves, team spirit, and excited fans",
+            "football": "Create a football marketing video with powerful tackles, impressive passes, team energy, passionate fans, and athletic prowess",
+            "soccer": "Create a soccer marketing video with skilled footwork, impressive goals, global appeal, and fan excitement",
+            "baseball": "Create a baseball marketing video showcasing perfect pitches, home runs, tradition, precision, and team celebration",
+            "tennis": "Create a tennis marketing video with precision shots, focus, competitive spirit, and crowd reactions",
+            "golf": "Create a golf marketing video with precision swings, concentration, scenic courses, and triumphant moments",
+            "fitness": "Create a fitness marketing video with motivational training, transformation stories, and healthy lifestyle promotion"
+        }
+    
+    def enhance_prompt_with_sports_context(self, prompt, labels):
+        """Enhance the prompt with sports-specific marketing video context"""
+        # Determine which sport context to use based on detected labels
+        sport_template = self.sports_video_templates["general"]
+        for sport in self.sports_video_templates:
+            if sport != "general" and sport in str(labels).lower():
+                sport_template = self.sports_video_templates[sport]
+                break
+                
+        # Enhance the prompt with sports marketing context
+        enhanced_prompt = f"{sport_template}. {prompt}. Include dynamic camera movements, brand visibility, and emotional connection. Show the excitement and passion of sports. Create a compelling advertisement that inspires viewers to engage with the brand."
+        return enhanced_prompt
     
     def process(self, image_bytes, prompt, status_callback=None, video_config=None):
-        """Generate video using Amazon Nova Reel"""
+        """Generate sports marketing video using Amazon Nova Reel"""
         try:
+            # Check if the image is sports-related
+            is_sports, labels = self.sports_classifier.is_sports_image(image_bytes)
+            
+            if not is_sports:
+                if status_callback:
+                    status_callback("error", "The uploaded image is not sports-related. Please upload an image related to sports for creating a sports marketing video.")
+                return "NOT_SPORTS_IMAGE"
+                
             # Convert image bytes to base64
             image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+            
+            # Enhance the prompt with sports marketing context
+            enhanced_prompt = self.enhance_prompt_with_sports_context(prompt, labels)
             
             # Use default config if none provided
             if video_config is None:
@@ -138,7 +251,7 @@ class NovaReelProcessor(AIModelProcessor):
             model_input = {
                 "taskType": "TEXT_VIDEO",
                 "textToVideoParams": {
-                    "text": prompt,
+                    "text": enhanced_prompt,
                     "images": [
                         {
                             "format": "png",
@@ -165,7 +278,7 @@ class NovaReelProcessor(AIModelProcessor):
             
             # Update status
             if status_callback:
-                status_callback("start", "Video generation started. Checking status...")
+                status_callback("start", "Sports marketing video generation started. Checking status...")
             
             # Check status until completed or failed
             status = "InProgress"
@@ -188,7 +301,7 @@ class NovaReelProcessor(AIModelProcessor):
                         if presigned_url:
                             status_callback("complete", presigned_url)
                         else:
-                            status_callback("warning", f"Video is available at: {bucket_uri}/output.mp4, but couldn't generate a presigned URL.")
+                            status_callback("warning", f"Sports marketing video is available at: {bucket_uri}/output.mp4, but couldn't generate a presigned URL.")
                     
                     return presigned_url
                     
@@ -201,22 +314,32 @@ class NovaReelProcessor(AIModelProcessor):
                 else:  # Still in progress
                     start_time = invocation["submitTime"]
                     if status_callback:
-                        status_callback("progress", f"Job in progress. Started at: {start_time}. Checking again in {self.poll_interval} seconds...")
+                        status_callback("progress", f"Sports marketing video generation in progress. Started at: {start_time}. Checking again in {self.poll_interval} seconds...")
                     time.sleep(self.poll_interval)
 
         except Exception as e:
             logger.error(f"Error in Nova Reel processing: {str(e)}")
             if status_callback:
-                status_callback("error", f"Error in Nova Reel processing: {str(e)}")
+                status_callback("error", f"Error in sports marketing video generation: {str(e)}")
             return None
 
 
 class StreamlitUI:
-    """UI handler for Streamlit"""
+    """UI handler for Streamlit for Sports Marketing Video Generator"""
     
     def __init__(self):
         self.nova_canvas = NovaCanvasProcessor()
         self.nova_reel = NovaReelProcessor()
+        
+        # Sports marketing prompt templates
+        self.sports_prompt_templates = {
+            "brand_awareness": "Create a sports marketing video that builds brand awareness with dynamic action and clear brand visibility",
+            "product_launch": "Create a sports marketing video showcasing a new product launch with athletes demonstrating its features",
+            "event_promotion": "Create a sports marketing video promoting an upcoming sports event with excitement and anticipation",
+            "athlete_endorsement": "Create a sports marketing video featuring an athlete endorsement with authentic connection to the brand",
+            "team_sponsorship": "Create a sports marketing video highlighting team sponsorship with brand integration and team spirit",
+            "inspirational": "Create an inspirational sports marketing video that motivates viewers with powerful athletic achievements"
+        }
     
     def status_callback(self, status_type, message):
         """Handle status updates"""
@@ -226,18 +349,155 @@ class StreamlitUI:
         if status_type == "start" or status_type == "progress":
             self.status_placeholder.info(message)
         elif status_type == "complete":
-            self.status_placeholder.success("Video generated successfully!")
+            self.status_placeholder.success("Sports marketing video generated successfully!")
             st.video(message)  # message contains the presigned URL
-            st.markdown(f"[Download Video]({message})")
+            st.markdown(f"[Download Sports Marketing Video]({message})")
         elif status_type == "warning":
             self.status_placeholder.warning(message)
         elif status_type == "error":
             self.status_placeholder.error(message)
     
     def run(self):
-        """Run the Streamlit UI"""
+        """Run the Sports Marketing Video Generator Streamlit UI"""
         # Set page config for a wider layout
-        st.set_page_config(
+        st.set_page_config(page_title="Sports Marketing Video Generator", layout="wide")
+        
+        # Main application logic
+        
+# Main application entry point
+if __name__ == "__main__":
+    ui = StreamlitUI()
+    ui.run()t_page_config(page_title="Sports Marketing Video Generator", layout="wide")
+        
+        # Header with sports theme
+        st.title("🏆 Sports Marketing Video Generator 🏆")
+        st.markdown("""
+        Transform sports images into compelling marketing videos for your brand.
+        Upload a sports-related image, choose your marketing goal, and let AI create a dynamic sports advertisement!
+        """)
+        
+        # Sidebar for options
+        with st.sidebar:
+            st.header("⚙️ Configuration")
+            
+            # Marketing goal selection
+            st.subheader("Marketing Goal")
+            marketing_goal = st.selectbox(
+                "Select your marketing objective:",
+                list(self.sports_prompt_templates.keys()),
+                format_func=lambda x: x.replace('_', ' ').title()
+            )
+            
+            # Video duration
+            st.subheader("Video Settings")
+            duration = st.slider("Video Duration (seconds)", min_value=3, max_value=10, value=6, step=1)
+            
+            # Video quality
+            quality_options = {
+                "Standard (720p)": "1280x720",
+                "High (1080p)": "1920x1080"
+            }
+            quality = st.selectbox("Video Quality", options=list(quality_options.keys()))
+            
+            # Advanced options
+            with st.expander("Advanced Options"):
+                fps = st.slider("Frames Per Second", min_value=24, max_value=30, value=24)
+                seed = st.number_input("Random Seed (0 for random)", min_value=0, value=0)
+                
+            # Create video config
+            video_config = {
+                "durationSeconds": duration,
+                "fps": fps,
+                "dimension": quality_options[quality],
+                "seed": seed
+            }
+        
+        # Main content area
+        col1, col2 = st.columns([1, 1])
+        
+        with col1:
+            st.header("1️⃣ Upload Sports Image")
+            uploaded_file = st.file_uploader("Choose a sports-related image...", type=["jpg", "jpeg", "png"])
+            
+            if uploaded_file is not None:
+                # Display the uploaded image
+                image = Image.open(uploaded_file)
+                st.image(image, caption="Uploaded Image", use_column_width=True)
+                
+                # Convert to bytes for processing
+                img_byte_arr = io.BytesIO()
+                image.save(img_byte_arr, format=image.format if image.format else 'PNG')
+                image_bytes = img_byte_arr.getvalue()
+                
+                # Check if image is sports-related
+                sports_classifier = SportsImageClassifier()
+                is_sports, labels = sports_classifier.is_sports_image(image_bytes)
+                
+                if not is_sports:
+                    st.error("⚠️ The uploaded image does not appear to be sports-related. Please upload an image related to sports for creating a sports marketing video.")
+                else:
+                    st.success("✅ Sports image detected! Ready to generate marketing video.")
+                    # Show detected sports elements
+                    with st.expander("View detected sports elements"):
+                        st.write(", ".join([label for label in labels if label in " ".join(sports_classifier.sports_keywords)]))
+        
+        with col2:
+            st.header("2️⃣ Customize Your Marketing Video")
+            
+            # Use template as starting point
+            base_prompt = self.sports_prompt_templates[marketing_goal]
+            
+            # Allow customization
+            custom_prompt = st.text_area(
+                "Customize your marketing message:",
+                value=base_prompt,
+                height=100
+            )
+            
+            # Brand information
+            brand_name = st.text_input("Brand Name (optional)")
+            if brand_name:
+                custom_prompt += f" for {brand_name}"
+                
+            # Target audience
+            target_audience = st.selectbox(
+                "Target Audience",
+                ["General Sports Fans", "Young Athletes", "Professional Athletes", "Fitness Enthusiasts", "Team Supporters"]
+            )
+            custom_prompt += f" targeting {target_audience.lower()}"
+            
+            # Call to action
+            cta_options = {
+                "Shop Now": "with a clear 'Shop Now' call to action",
+                "Learn More": "with an inviting 'Learn More' call to action",
+                "Join Today": "with an engaging 'Join Today' call to action",
+                "Sign Up": "with a compelling 'Sign Up' call to action",
+                "Visit Website": "with a direct 'Visit Website' call to action"
+            }
+            cta = st.selectbox("Call to Action", list(cta_options.keys()))
+            custom_prompt += f" {cta_options[cta]}"
+            
+            # Generate button
+            generate_button = st.button("🎬 Generate Sports Marketing Video")
+            
+            if generate_button and uploaded_file is not None:
+                if not is_sports:
+                    st.error("Cannot generate video. Please upload a sports-related image.")
+                else:
+                    # Process with Nova Reel
+                    result = self.nova_reel.process(
+                        image_bytes=image_bytes,
+                        prompt=custom_prompt,
+                        status_callback=self.status_callback,
+                        video_config=video_config
+                    )
+                    
+                    if result == "NOT_SPORTS_IMAGE":
+                        st.error("The image was not recognized as sports-related. Please upload a different image.")
+        
+        # Footer
+        st.markdown("---")
+        st.markdown("Powered by AWS Bedrock Nova Reel and Nova Canvas")t_page_config(
             page_title="AI Image to Video Generator",
             page_icon="🎬",
             layout="wide"
