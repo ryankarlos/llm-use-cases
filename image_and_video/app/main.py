@@ -95,31 +95,7 @@ class NovaCanvasProcessor(AIModelProcessor):
         self.accept = "application/json"
         self.content_type = "application/json"
         self.sports_classifier = SportsImageClassifier()
-        
-        # Sports marketing context for enhancing prompts
-        self.sports_context = {
-            "general": "dynamic sports marketing advertisement with high energy and motion",
-            "basketball": "basketball marketing with dynamic action shots, team spirit, and excitement",
-            "football": "football marketing with team energy, passionate fans, and athletic prowess",
-            "soccer": "soccer marketing with global appeal, skill showcase, and fan excitement",
-            "baseball": "baseball marketing with tradition, precision, and team celebration",
-            "tennis": "tennis marketing with precision, focus, and competitive spirit",
-            "golf": "golf marketing with precision, concentration, and scenic courses",
-            "fitness": "fitness marketing with motivation, transformation, and healthy lifestyle"
-        }
     
-    def enhance_prompt_with_sports_context(self, prompt, labels):
-        """Enhance the prompt with sports-specific marketing context"""
-        # Determine which sport context to use based on detected labels
-        sport_context = self.sports_context["general"]
-        for sport in self.sports_context:
-            if sport != "general" and sport in str(labels).lower():
-                sport_context = self.sports_context[sport]
-                break
-                
-        # Enhance the prompt with sports marketing context
-        enhanced_prompt = f"{prompt}. Create a {sport_context}. Include dynamic motion, brand visibility, and emotional connection."
-        return enhanced_prompt
     
     def process(self, image_bytes, negative_prompt, main_prompt, mask_prompt, operation_type, config=None):
         """Process image using Amazon Nova Canvas for inpainting or outpainting with sports focus"""
@@ -196,28 +172,16 @@ class NovaReelProcessor(AIModelProcessor):
         self.poll_interval = poll_interval
         self.s3_service = S3Service()
         self.sports_classifier = SportsImageClassifier()
-        
-        # Sports marketing video templates
-        self.sports_video_templates = {
-            "general": "Create a dynamic sports marketing video with high energy motion, brand visibility, and emotional connection to fans",
-            "basketball": "Create a basketball marketing video with dynamic action shots, players making impressive moves, team spirit, and excited fans",
-            "football": "Create a football marketing video with powerful tackles, impressive passes, team energy, passionate fans, and athletic prowess",
-            "soccer": "Create a soccer marketing video with skilled footwork, impressive goals, global appeal, and fan excitement",
-            "baseball": "Create a baseball marketing video showcasing perfect pitches, home runs, tradition, precision, and team celebration",
-            "tennis": "Create a tennis marketing video with precision shots, focus, competitive spirit, and crowd reactions",
-            "golf": "Create a golf marketing video with precision swings, concentration, scenic courses, and triumphant moments",
-            "fitness": "Create a fitness marketing video with motivational training, transformation stories, and healthy lifestyle promotion"
-        }
+    
     
     def enhance_prompt_with_sports_context(self, prompt, labels):
         """Enhance the prompt with sports-specific marketing video context"""
         # Determine which sport context to use based on detected labels
-        sport_template = self.sports_video_templates["general"]
-        for sport in self.sports_video_templates:
-            if sport != "general" and sport in str(labels).lower():
-                sport_template = self.sports_video_templates[sport]
-                break
-                
+        sport_template = "You are SportVision AI, a premier sports marketing agency specializing in creating dynamic sports content. " \
+        "As an expert in sports advertising, your role is to generate compelling, authentic sports marketing materials that resonate with fans and athletes. " \
+        "Focus on capturing the energy, emotion, and competitive spirit of sports while maintaining brand visibility and marketing objectives. " \
+        "Incorporate sports-specific terminology, athlete movements, and fan experiences in your content. Always prioritize action, motion, and emotional connection in sports contexts"
+
         # Enhance the prompt with sports marketing context
         enhanced_prompt = f"{sport_template}. {prompt}. Include dynamic camera movements, brand visibility, and emotional connection. Show the excitement and passion of sports. Create a compelling advertisement that inspires viewers to engage with the brand."
         return enhanced_prompt
@@ -331,16 +295,6 @@ class StreamlitUI:
         self.nova_canvas = NovaCanvasProcessor()
         self.nova_reel = NovaReelProcessor()
         
-        # Sports marketing prompt templates
-        self.sports_prompt_templates = {
-            "brand_awareness": "Create a sports marketing video that builds brand awareness with dynamic action and clear brand visibility",
-            "product_launch": "Create a sports marketing video showcasing a new product launch with athletes demonstrating its features",
-            "event_promotion": "Create a sports marketing video promoting an upcoming sports event with excitement and anticipation",
-            "athlete_endorsement": "Create a sports marketing video featuring an athlete endorsement with authentic connection to the brand",
-            "team_sponsorship": "Create a sports marketing video highlighting team sponsorship with brand integration and team spirit",
-            "inspirational": "Create an inspirational sports marketing video that motivates viewers with powerful athletic achievements"
-        }
-    
     def status_callback(self, status_type, message):
         """Handle status updates"""
         if not hasattr(self, 'status_placeholder'):
@@ -360,15 +314,7 @@ class StreamlitUI:
     def run(self):
         """Run the Sports Marketing Video Generator Streamlit UI"""
         # Set page config for a wider layout
-        st.set_page_config(page_title="Sports Marketing Video Generator", layout="wide")
-        
-        # Main application logic
-        
-# Main application entry point
-if __name__ == "__main__":
-    ui = StreamlitUI()
-    ui.run()t_page_config(page_title="Sports Marketing Video Generator", layout="wide")
-        
+        st.set_page_config(page_title="Sports Marketing Video Generator", layout="wide")        
         # Header with sports theme
         st.title("🏆 Sports Marketing Video Generator 🏆")
         st.markdown("""
