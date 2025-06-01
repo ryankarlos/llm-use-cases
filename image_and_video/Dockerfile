@@ -10,11 +10,11 @@ RUN apt-get update && apt-get install -y \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-COPY app/ .
+COPY src/image_and_video .
 
 RUN pip3 install -r requirements.txt
 
 # Create directories for temporary files
 RUN mkdir -p /app/temp/images /app/temp/videos /app/temp/music
 
-ENTRYPOINT ["streamlit", "run", "streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+ENTRYPOINT ["streamlit", "run", "main.py", "--server.port=8501", "--server.address=0.0.0.0"]

@@ -1,5 +1,7 @@
 
 
+
+
 module "route_53_records" {
   source           = "github.com/ryankarlos/terraform_modules.git//aws/route_53/alias_record"
   hosted_zone_name = var.hosted_zone_name
@@ -10,14 +12,6 @@ module "route_53_records" {
 
 
 
-# Add the CNAME record to Route 53
-# resource "aws_route53_record" "my_cname_record" {
-#   name    = "${var.subdomain}.${var.hosted_zone_name}"
-#   type    = "CNAME"
-#   records = [aws_acm_certificate.cert.resource_record_value]
-#   zone_id = module.route_53_records.zone_id
-
-# }
 
 module "load_balancer" {
   source                       = "github.com/ryankarlos/terraform_modules.git//aws/load_balancer/application/ip_target"
@@ -66,7 +60,7 @@ module "ecs" {
         {
           name  = "APP_CLIENT_SECRET"
           value = aws_cognito_user_pool_client.client.client_secret
-        }
+        },
       ]
       image = var.image_uri
       portMappings = [{
@@ -115,12 +109,32 @@ resource "aws_cognito_user_pool" "user_pool" {
     require_symbols   = false
     require_uppercase = false
   }
+  schema {
+    name                     = "group"
+    attribute_data_type      = "String"
+    developer_only_attribute = false
+    mutable                  = true 
+    required                 = false 
+    string_attribute_constraints {}
+  }
 }
 
+
 resource "aws_cognito_user_pool_client" "client" {
-  name            = "client"
-  generate_secret = true
-  user_pool_id    = aws_cognito_user_pool.user_pool.id
+  name                         = "client"
+  generate_secret              = true
+  user_pool_id                 = aws_cognito_user_pool.user_pool.id
+  callback_urls                = ["https://${var.subdomain}/${var.hosted_zone_name}/oauth2/idpresponse"]
+  logout_urls                  = ["https://${var.subdomain}/${var.hosted_zone_name}"]
+  allowed_oauth_flows          = ["code"]
+  allowed_oauth_scopes         = ["email", "openid", "profile"]
+  allowed_oauth_flows_user_pool_client = true
+  supported_identity_providers = ["COGNITO"]
+   token_validity_units {
+      access_token  = "minutes" 
+      id_token      = "minutes" 
+      refresh_token = "days" 
+  }
 }
 
 # Add Cognito user
@@ -132,12 +146,7 @@ resource "aws_cognito_user" "user" {
     email          = var.cognito_email
     email_verified = true
   }
-  
-  enabled = true
-  
-  message_action = var.cognito_send_email ? "SEND" : "SUPPRESS"
-  
-  temporary_password = var.cognito_generate_password ? null : "ChangeMe123!"
+
 }
 
 resource "awscc_bedrock_guardrail" "example" {
@@ -175,5 +184,33 @@ resource "aws_acm_certificate" "cert" {
 
   lifecycle {
     create_before_destroy = true
+  }
+}
+
+
+resource "aws_route53_record" "example" {
+  for_each = {
+    for dvo in aws_acm_certificate.cert.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.selected.zone_id
+}
+
+
+resource "aws_ecr_repository" "foo" {
+  name                 = var.ecr_repo_name
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
   }
 }

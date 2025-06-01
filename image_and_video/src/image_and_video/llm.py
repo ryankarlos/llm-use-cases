@@ -5,8 +5,8 @@ import time
 import logging
 import base64
 from abc import ABC, abstractmethod
-from .sports_classifier import SportsImageClassifier
-from .config import AWS_REGION, S3_BUCKET, POLL_INTERVAL, DEFAULT_VIDEO_CONFIG, DEFAULT_IMAGE_CONFIG, NOVA_REEL_BASE_PROMPT
+from sports_classifier import SportsImageClassifier
+from config import AWS_REGION, S3_BUCKET, POLL_INTERVAL, DEFAULT_VIDEO_CONFIG, DEFAULT_IMAGE_CONFIG, NOVA_REEL_BASE_PROMPT
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -131,93 +131,79 @@ class NovaReelProcessor(AIModelProcessor):
     
     def process(self, image_bytes, prompt, status_callback=None, video_config=None):
         """Generate sports marketing video using Amazon Nova Reel"""
-        try:
-            # Check if the image is sports-related
-            is_sports, labels = self.sports_classifier.is_sports_image(image_bytes)
-            
-            if not is_sports:
-                if status_callback:
-                    status_callback("error", "The uploaded image is not sports-related. Please upload an image related to sports for creating a sports marketing video.")
-                return "NOT_SPORTS_IMAGE"
-                
-            # Convert image bytes to base64
-            image_base64 = base64.b64encode(image_bytes).decode('utf-8')
-            
-            # Use default config if none provided
-            if video_config is None:
-                video_config = DEFAULT_VIDEO_CONFIG
+        # Convert image bytes to base64
+        image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+        
+        # Use default config if none provided
+        if video_config is None:
+            video_config = DEFAULT_VIDEO_CONFIG
 
-            model_input = {
-                "taskType": "TEXT_VIDEO",
-                "textToVideoParams": {
-                    "text": prompt,
-                    "images": [
-                        {
-                            "format": "png",
-                            "source": {
-                                "bytes": image_base64
-                            }
+        model_input = {
+            "taskType": "TEXT_VIDEO",
+            "textToVideoParams": {
+                "text": prompt,
+                "images": [
+                    {
+                        "format": "JPEG",
+                        "source": {
+                            "bytes": image_base64
                         }
-                    ]
-                },
-                "videoGenerationConfig": video_config,
-            }
-
-            # Start the asynchronous video generation job
-            invocation = self.bedrock_runtime.start_async_invoke(
-                modelId="amazon.nova-reel-v1:1",
-                modelInput=model_input,
-                outputDataConfig={
-                    "s3OutputDataConfig": {
-                        "s3Uri": f"s3://{self.s3_bucket}",
                     }
-                },
-            )
-            invocation_arn = invocation["invocationArn"]
-            
-            # Update status
-            if status_callback:
-                status_callback("start", "Sports marketing video generation started. Checking status...")
-            
-            # Check status until completed or failed
-            status = "InProgress"
-            while status == "InProgress":
-                invocation = self.bedrock_runtime.get_async_invoke(
-                    invocationArn=invocation_arn
-                )
-                status = invocation["status"]
-                
-                if status == "Completed":
-                    # Extract S3 bucket information
-                    bucket_uri = invocation["outputDataConfig"]["s3OutputDataConfig"]["s3Uri"]
-                    bucket_name = bucket_uri.replace("s3://", "").split("/")[0]
-                    object_key = "output.mp4"  # Default output filename
-                    
-                    # Generate a presigned URL for the video
-                    presigned_url = self.s3_service.create_presigned_url(bucket_name, object_key)
-                    
-                    if status_callback:
-                        if presigned_url:
-                            status_callback("complete", presigned_url)
-                        else:
-                            status_callback("warning", f"Sports marketing video is available at: {bucket_uri}/output.mp4, but couldn't generate a presigned URL.")
-                    
-                    return presigned_url
-                    
-                elif status == "Failed":
-                    failure_message = invocation["failureMessage"]
-                    if status_callback:
-                        status_callback("error", f"Job failed. Failure message: {failure_message}")
-                    return None
-                    
-                else:  # Still in progress
-                    start_time = invocation["submitTime"]
-                    if status_callback:
-                        status_callback("progress", f"Video generation in progress. Started at: {start_time}. Checking again in {self.poll_interval} seconds...")
-                    time.sleep(self.poll_interval)
+                ]
+            },
+            "videoGenerationConfig": video_config,
+        }
 
-        except Exception as e:
-            logger.error(f"Error in Nova Reel processing: {str(e)}")
-            if status_callback:
-                status_callback("error", f"Error in sports marketing video generation: {str(e)}")
-            return None
+        # Start the asynchronous video generation job
+        invocation = self.bedrock_runtime.start_async_invoke(
+            modelId="amazon.nova-reel-v1:1",
+            modelInput=model_input,
+            outputDataConfig={
+                "s3OutputDataConfig": {
+                    "s3Uri": f"s3://{self.s3_bucket}",
+                }
+            }
+        )
+        invocation_arn = invocation["invocationArn"]
+        
+        # Update status
+        if status_callback:
+            status_callback("start", "Sports marketing video generation started. Checking status...")
+        
+        # Check status until completed or failed
+        status = "InProgress"
+        while status == "InProgress":
+            invocation = self.bedrock_runtime.get_async_invoke(
+                invocationArn=invocation_arn
+            )
+            status = invocation["status"]
+            
+            if status == "Completed":
+                # Extract S3 bucket information
+                bucket_uri = invocation["outputDataConfig"]["s3OutputDataConfig"]["s3Uri"]
+                bucket_name = bucket_uri.replace("s3://", "").split("/")[0]
+                object_key = "output.mp4"  # Default output filename
+                
+                # Generate a presigned URL for the video
+                presigned_url = self.s3_service.create_presigned_url(bucket_name, object_key)
+                
+                if status_callback:
+                    if presigned_url:
+                        status_callback("complete", presigned_url)
+                    else:
+                        status_callback("warning", f"Sports marketing video is available at: {bucket_uri}/output.mp4, but couldn't generate a presigned URL.")
+                
+                return presigned_url
+                
+            elif status == "Failed":
+                failure_message = invocation["failureMessage"]
+                if status_callback:
+                    status_callback("error", f"Job failed. Failure message: {failure_message}")
+                return None
+                
+            else:  # Still in progress
+                start_time = invocation["submitTime"]
+                if status_callback:
+                    status_callback("progress", f"Video generation in progress. Started at: {start_time}. Checking again in {self.poll_interval} seconds...")
+                time.sleep(self.poll_interval)
+

@@ -1,9 +1,10 @@
 import streamlit as st
 from PIL import Image
 import io
-from .llm import NovaCanvasProcessor, NovaReelProcessor
-from .sports_classifier import SportsImageClassifier
-from .config import SPORTS_MARKETING_VIDEOS, DEFAULT_VIDEO_CONFIG
+from llm import NovaCanvasProcessor, NovaReelProcessor
+from sports_classifier import SportsImageClassifier
+from config import SPORTS_MARKETING_VIDEOS, DEFAULT_VIDEO_CONFIG
+from utils import resize_image
 
 class StreamlitUI:
     """Simplified UI for Sports Marketing Video Generator"""
@@ -12,11 +13,15 @@ class StreamlitUI:
         self.nova_canvas = NovaCanvasProcessor()
         self.nova_reel = NovaReelProcessor()
         self.sports_marketing_videos = SPORTS_MARKETING_VIDEOS
-        self.processed_image = None
-        self.original_image = None
-        self.current_image = None  # Tracks the currently displayed/active image
-        # Add this line to fix the error
         self.sports_prompt_templates = SPORTS_MARKETING_VIDEOS
+        
+        # Initialize session state for persistent storage
+        if 'processed_image' not in st.session_state:
+            st.session_state.processed_image = None
+        if 'original_image' not in st.session_state:
+            st.session_state.original_image = None
+        if 'current_image' not in st.session_state:
+            st.session_state.current_image = None
     
     def status_callback(self, status_type, message):
         """Handle status updates"""
@@ -36,9 +41,7 @@ class StreamlitUI:
     
     def run(self):
         """Run the simplified Sports Marketing Video Generator UI"""
-        # Set page config
-        st.set_page_config(page_title="Sports Marketing Video Generator", layout="wide")
-        
+
         # Apply colorful background and styling with green shades
         st.markdown("""
         <style>
@@ -111,12 +114,7 @@ class StreamlitUI:
                 format_func=lambda x: x.replace('_', ' ').title()
             )
             
-            # Sport type selection
-            sport_type = st.selectbox(
-                "Sport Type:",
-                ["Basketball", "Football", "Soccer", "Tennis", "Golf", "Swimming", 
-                 "Running", "Cycling", "Baseball", "Volleyball", "General Sports"]
-            )
+            # Sport type will be automatically detected from the image
             
             # Brand name input
             brand_name = st.text_input("Brand Name (optional)")
@@ -136,9 +134,13 @@ class StreamlitUI:
             image.save(img_byte_arr, format=image.format if image.format else 'PNG')
             image_bytes = img_byte_arr.getvalue()
             
-            # Check if image is sports-related
+            # Resize image to 1280x720
+            from utils import resize_image
+            image_bytes = resize_image(image_bytes, width=1280, height=720)
+            
+            # Check if image is sports-related and get sport type
             sports_classifier = SportsImageClassifier()
-            is_sports, labels = sports_classifier.is_sports_image(image_bytes)
+            is_sports, labels, sport_type = sports_classifier.is_sports_image(image_bytes)
             
             if not is_sports:
                 st.error("⚠️ This doesn't appear to be a sports image. Please upload a sports-related image.")
@@ -147,9 +149,9 @@ class StreamlitUI:
             # Display image and detected sports
             col1, col2 = st.columns([1, 1])
             
-            # Store the original image
-            self.original_image = image_bytes
-            self.current_image = image_bytes  # Initially set current image to original
+            # Store the original image in session state
+            st.session_state.original_image = image_bytes
+            st.session_state.current_image = image_bytes  # Initially set current image to original
             
             # Display the original image in col1
             with col1:
@@ -157,14 +159,16 @@ class StreamlitUI:
                 st.success("✅ Sports image detected!")
                 st.write("Detected sports elements: " + ", ".join([label for label in labels 
                                                             if label in " ".join(sports_classifier.sports_keywords)]))
+                st.info(f"Detected sport type: {sport_type}")
             
             # Image processing section
             with col2:
                 st.subheader("Image Processing")
                 
-                # Show current processed image if available
-                if self.processed_image:
-                    st.image(self.processed_image, caption="Processed Image", use_column_width=True)
+                # Show current processed image if available in session state
+                if st.session_state.processed_image:
+                    st.image(st.session_state.processed_image, caption="Processed Image", use_column_width=True)
+                    st.success("✅ Image processed successfully!")
                     st.info("This processed image will be used for video generation")
                 
                 # Create two columns for the processing buttons
@@ -180,9 +184,12 @@ class StreamlitUI:
                                       use_container_width=True):
                     if main_prompt and mask_prompt:
                         with st.spinner("Applying inpainting..."):
-                            # Use current image for processing
+                            # Ensure image is properly sized to 1280x720 before processing
+                            resized_image = resize_image(st.session_state.current_image, width=1280, height=720)
+                            
+                            # Use resized image for processing
                             processed_result = self.nova_canvas.process(
-                                image_bytes=self.current_image,
+                                image_bytes=resized_image,
                                 negative_prompt=negative_prompt,
                                 main_prompt=main_prompt,
                                 mask_prompt=mask_prompt,
@@ -192,10 +199,13 @@ class StreamlitUI:
                             if processed_result == "NOT_SPORTS_IMAGE":
                                 st.error("The image was not recognized as sports-related.")
                             elif processed_result:
-                                self.processed_image = processed_result
-                                self.current_image = processed_result  # Update current image
+                                # Store in session state for persistence
+                                st.session_state.processed_image = processed_result
+                                st.session_state.current_image = processed_result  # Update current image
                                 st.success("✅ Inpainting applied successfully!")
-                                st.experimental_rerun()  # Rerun to update the UI
+                                # Display the processed image
+                                st.image(st.session_state.processed_image, caption="Inpainted Result", use_column_width=True)
+                                st.rerun()  # Rerun to update the UI
                             else:
                                 st.error("Failed to process the image with inpainting")
                 
@@ -206,9 +216,12 @@ class StreamlitUI:
                                       use_container_width=True):
                     if main_prompt and mask_prompt:
                         with st.spinner("Applying outpainting..."):
-                            # Use current image for processing
+                            # Ensure image is properly sized to 1280x720 before processing
+                            resized_image = resize_image(st.session_state.current_image, width=1280, height=720)
+                            
+                            # Use resized image for processing
                             processed_result = self.nova_canvas.process(
-                                image_bytes=self.current_image,
+                                image_bytes=resized_image,
                                 negative_prompt=negative_prompt,
                                 main_prompt=main_prompt,
                                 mask_prompt=mask_prompt,
@@ -218,18 +231,21 @@ class StreamlitUI:
                             if processed_result == "NOT_SPORTS_IMAGE":
                                 st.error("The image was not recognized as sports-related.")
                             elif processed_result:
-                                self.processed_image = processed_result
-                                self.current_image = processed_result  # Update current image
+                                # Store in session state for persistence
+                                st.session_state.processed_image = processed_result
+                                st.session_state.current_image = processed_result  # Update current image
                                 st.success("✅ Outpainting applied successfully!")
-                                st.experimental_rerun()  # Rerun to update the UI
+                                # Display the processed image
+                                st.image(st.session_state.processed_image, caption="Outpainted Result", use_column_width=True)
+                                st.rerun()  # Rerun to update the UI
                             else:
                                 st.error("Failed to process the image with outpainting")
                 
                 # Reset button to go back to original image
                 if st.button("Reset to Original Image", use_container_width=True):
-                    self.current_image = self.original_image
-                    self.processed_image = None
-                    st.experimental_rerun()  # Rerun to update the UI
+                    st.session_state.current_image = st.session_state.original_image
+                    st.session_state.processed_image = None
+                    st.rerun()  # Rerun to update the UI
             
             # Video generation section
             st.markdown("---")
@@ -238,7 +254,7 @@ class StreamlitUI:
             # Get base prompt from template
             base_prompt = self.sports_marketing_videos[marketing_template]
             
-            # Enhance the prompt with Nova Reel base prompt
+            # Enhance the prompt with Nova Reel base prompt using detected sport type
             enhanced_prompt = self.nova_reel.enhance_prompt(
                 marketing_prompt=base_prompt,
                 brand=brand_name,
@@ -251,8 +267,8 @@ class StreamlitUI:
             
             # Generate button with clearer label
             if st.button("🎬 Generate Sports Marketing Video with Current Image", use_container_width=True):
-                # Use current image for video generation
-                image_to_use = self.current_image
+                # Use current image for video generation, ensuring it's properly sized to 1280x720
+                image_to_use = resize_image(st.session_state.current_image, width=1280, height=720)
                 
                 # Process with Nova Reel
                 with st.spinner("Generating sports marketing video..."):

@@ -19,15 +19,17 @@ locals {
   # Add username and email for Cognito user
   username = "ryan"
   email = "ryankarlos@gmail.com"
+  ecr_repo_name = "canvas-video"
 }
 
 inputs = {
   hosted_zone_name = "ryannaz-mlops.com"
-  image_uri = "${local.account_id}.dkr.ecr.${local.region}.amazonaws.com/canvas-video"
+  ecr_repo_name = local.ecr_repo_name
+  image_uri = "${local.account_id}.dkr.ecr.${local.region}.amazonaws.com/${local.ecr_repo_name}"
   bucket_name = "image-llm-example"
   target_group_name = "lb-target"
   region  = local.region
-  subdomain = "llm-image-app"
+  subdomain = "nova-video"
   tag = {name="llm-image-app"}
   alb_name = "llm-image-app-lb"
   cluster_name = "llm-image-app-cluster"
@@ -47,4 +49,6 @@ inputs = {
   cognito_email = local.email
   cognito_generate_password = true
   cognito_send_email = true
+  cognito_user_pool_name = "nova_app_pool"
+  cognito_redirect_uri = "https://nova-video.awscommunity.com/"
 }

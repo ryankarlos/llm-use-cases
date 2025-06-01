@@ -113,7 +113,13 @@ variable "target_group_name" {
 variable "cognito_user_pool_name" {
   description = "name of cognito user pool"
   type        = string
-  default     = "prometheus_cognito_pool"
+  default     = "nova_pool"
+}
+
+variable "cognito_redirect_uri" {
+  description = "Redirect URI for Cognito authentication"
+  type        = string
+  default     = "http://localhost:8501/"
 }
 
 variable "security_group_id" {
@@ -152,4 +158,9 @@ variable "cognito_send_email" {
   description = "Whether to send an email to the Cognito user"
   type        = bool
   default     = true
+}
+
+variable "ecr_repo_name" {
+  description = "ECR repo name"
+  type        = string
 }
