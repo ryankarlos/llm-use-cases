@@ -17,8 +17,8 @@ locals {
   account_id =  get_aws_account_id()
   region = "us-east-1"
   # Add username and email for Cognito user
-  username = "ryan"
-  email = "ryankarlos@gmail.com"
+  username = "user"
+  email = "user@example.com"
   ecr_repo_name = "canvas-video"
 }
 
