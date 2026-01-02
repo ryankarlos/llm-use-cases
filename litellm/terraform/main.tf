@@ -223,10 +223,174 @@ module "elasticache" {
 }
 
 
-resource "aws_acm_certificate" "corp_cert" {
+resource "aws_acm_certificate" "litellm_cert" {
   private_key      = file(var.cert_pk)
   certificate_body = file(var.cert_body)
   lifecycle {
     create_before_destroy = true
   }
+}
+
+resource "aws_s3_object" "file_upload" {
+  bucket      = module.s3_litellm_config.s3_bucket_id
+  key         = var.litellm_config_name
+  source      = local.litellm_config_path
+  source_hash = filemd5(local.litellm_config_path)
+}
+
+
+module "route_53_records_litellm" {
+  source           = "github.com/ryankarlos/terraform_modules.git//aws/route_53/alias_record"
+  hosted_zone_name = var.hosted_zone_name
+  subdomain        = var.subdomain
+  alias_name       = module.load_balancer_litellm.dns
+  alias_zone_id    = module.load_balancer_litellm.zone_id
+}
+
+
+module "acm_cert_litellm" {
+  source                    = "github.com/ryankarlos/terraform_modules.git//aws/acm_certificate"
+  certificate_authority_arn = var.certificate_authority_arn
+  domain_name               = module.route_53_records_litellm.record_fqdn
+}
+
+
+resource "aws_lb_listener_certificate" "litellm_listener_cert" {
+  listener_arn    = module.load_balancer_litellm.https_listener_arn
+  certificate_arn = module.acm_cert_litellm.certificate_arn
+}
+
+
+module "load_balancer_litellm" {
+  source                       = "github.com/ryankarlos/terraform_modules.git//aws/load_balancer/application/ip_target"
+  vpc_id                       = data.aws_vpc.main.id
+  subnet_ids                   = local.az_subnet_ids.workload
+  certificate_arn              = module.acm_cert_litellm.certificate_arn
+  security_group_id            = data.aws_security_group.workload_security_group.id
+  alb_name                     = var.alb_name
+  tag                          = var.tag
+  target_group_port            = var.litellm_port
+  target_group_name            = var.target_group_name
+  enable_mutual_authentication = false
+  health_check_path            = "/health/liveliness"
+  enable_http_listener         = true
+}
+
+
+
+
+module "ecs_litellm" {
+  source = "github.com/ryankarlos/terraform_modules.git//aws/ecs"
+
+  cluster_name                    = "litellm-cluster"
+  service_name                    = "litellm-service"
+  container_name                  = "litellm-container"
+  subnet_ids                      = local.az_subnet_ids.workload
+  desired_count                   = var.desired_count
+  min_capacity                    = var.min_capacity
+  max_capacity                    = var.max_capacity
+  launch_type                     = var.launch_type
+  security_group_ids              = [data.aws_security_group.workload_security_group.id]
+  task_execution_role_name        = "LitellmTaskExecutionRole"
+  task_role_name                  = "LitellmTaskRole"
+  enable_load_balancer            = true
+  enable_circuit_breaker_rollback = true
+  enable_circuit_breaker          = true
+
+  container_definitions = jsonencode([
+    {
+      name      = "litellm-container"
+      essential = true
+      environment = [
+        {
+          name  = "AWS_REGION"
+          value = data.aws_region.current.name
+        },
+        {
+          name  = "LITELLM_LOG"
+          value = var.litellm_log_level
+        },
+        {
+          name  = "LITELLM_CONFIG_BUCKET_NAME"
+          value = "${module.s3_litellm_config.s3_bucket_id}"
+        },
+        {
+          name  = "LITELLM_CONFIG_BUCKET_OBJECT_KEY"
+          value = var.litellm_config_name
+        },
+        {
+          name  = "DATABASE_NAME"
+          value = "${module.aurora_db.cluster_database_name}"
+        },
+        {
+          name  = "DATABASE_HOST"
+          value = "${module.aurora_db.cluster_endpoint}"
+        },
+        {
+          name  = "DATABASE_PORT"
+          value = "${tostring(module.aurora_db.cluster_port)}"
+        },
+        {
+          name  = "DATABASE_USERNAME",
+          value = "${module.aurora_db.cluster_master_username}"
+        },
+
+        {
+          name  = "REDIS_HOST",
+          value = "${module.elasticache.replication_group_primary_endpoint_address}"
+        },
+        {
+          name  = "REDIS_PORT",
+          value = "${tostring(var.redis_port)}"
+        },
+        {
+          name  = "REDIS_PASSWORD",
+          value = "${random_password.redis_password_main.result}"
+        },
+        {
+          name = "REDIS_SSL",
+        value = "True" }
+
+      ],
+      # this block fetches values from secret manager
+      secrets = [
+        {
+          "name" : "LITELLM_MASTER_KEY",
+          "valueFrom" : "${module.litellm_secrets.secret_arn}:LITELLM_MASTER_KEY::"
+        },
+        {
+          "name" : "LITELLM_SALT_KEY",
+          "valueFrom" : "${module.litellm_secrets.secret_arn}:LITELLM_SALT_KEY::"
+        },
+        {
+          "name" : "UI_PASSWORD",
+          "valueFrom" : "${module.litellm_secrets.secret_arn}:LITELLM_MASTER_KEY::"
+        },
+
+        {
+          "name" : "DATABASE_URL",
+          "valueFrom" : "${module.litellm_aurora_secret.secret_arn}:DATABASE_URL::"
+        }
+      ]
+      image = var.image_uri_litellm
+      portMappings = [{
+        appProtocol   = "http"
+        containerPort = var.litellm_port,
+        hostPort      = var.litellm_port,
+        protocol      = "tcp"
+      }]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = "demo-litellm"
+          "awslogs-region"        = data.aws_region.current.name
+          "awslogs-stream-prefix" = "ecs"
+          "awslogs-create-group"  = "true"
+          "mode" : "non-blocking",
+        }
+      }
+  }])
+  scaling_type     = "cpu"
+  container_port   = var.litellm_port
+  target_group_arn = module.load_balancer_litellm.target_group_arn
 }

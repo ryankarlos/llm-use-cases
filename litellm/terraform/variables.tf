@@ -256,3 +256,92 @@ variable "aurora_scaling_config" {
   }
 }
 
+
+
+variable "env" {
+  description = "Environment name (e.g., dev, staging, prod)"
+  type        = string
+}
+
+variable "hosted_zone_name" {
+  description = "Route53 hosted zone name"
+  type        = string
+}
+
+variable "subdomain" {
+  description = "Subdomain for the litellm service"
+  type        = string
+  default     = "litellm"
+}
+
+variable "alb_name" {
+  description = "Name for the Application Load Balancer"
+  type        = string
+  default     = "litellm"
+}
+
+variable "target_group_name" {
+  description = "Name for the target group"
+  type        = string
+  default     = "litellm-target-group"
+}
+
+variable "litellm_port" {
+  description = "Port for litellm container"
+  type        = number
+  default     = 4000
+}
+
+variable "redis_port" {
+  description = "Port for Redis/Valkey"
+  type        = number
+  default     = 6379
+}
+
+variable "desired_count" {
+  description = "Desired number of ECS tasks"
+  type        = number
+  default     = 1
+}
+
+variable "min_capacity" {
+  description = "Minimum capacity for ECS auto scaling"
+  type        = number
+  default     = 1
+}
+
+variable "max_capacity" {
+  description = "Maximum capacity for ECS auto scaling"
+  type        = number
+  default     = 4
+}
+
+variable "launch_type" {
+  description = "ECS launch type"
+  type        = string
+  default     = "FARGATE"
+}
+
+variable "s3_buckets" {
+  description = "S3 bucket names"
+  type = object({
+    lb_access_logs = string
+    litellm        = string
+  })
+}
+
+variable "cert_pk" {
+  description = "Path to certificate private key file"
+  type        = string
+}
+
+variable "cert_body" {
+  description = "Path to certificate body file"
+  type        = string
+}
+
+variable "eks_oidc_provider_url" {
+  description = "EKS OIDC provider URL"
+  type        = string
+  default     = ""
+}

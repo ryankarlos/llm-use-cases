@@ -19,7 +19,7 @@ output "aurora_cluster_reader_endpoint" {
 
 output "cert_secret_arn" {
   description = "cert secret arn"
-  value       = module.corp_cert_secret.secret_arn
+  value       = module.litellm_secrets.secret_arn
 }
 
 
