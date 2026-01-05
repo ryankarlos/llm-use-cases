@@ -409,10 +409,8 @@ def find_nearby_hospitals(params):
             "message": f"Found {len(hospitals)} NHS facilities near {patient_address}"
         }
         
-    except location.exceptions.AccessDeniedException:
-        # Fallback to mock data if Location Service not configured
-        return _mock_nearby_hospitals(patient_name, patient_address)
     except Exception as e:
+        # Fallback to mock data if Location Service not configured or errors
         print(f"Location Service error: {e}")
         return _mock_nearby_hospitals(patient_name, patient_address)
 

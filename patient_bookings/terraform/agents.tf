@@ -211,19 +211,4 @@ resource "aws_bedrockagent_agent_action_group" "booking" {
 
 # Note: Web Grounding is enabled via Nova Premier (us.amazon.nova-premier-v1:0).
 # The nova_grounding system tool is automatically available for real-time web search.
-# Web Grounding requires the bedrock:InvokeTool permission for the system tool.
-
-# IAM permission for Web Grounding
-resource "aws_iam_role_policy" "bedrock_agent_web_grounding" {
-  name = "${var.project_name}-agent-web-grounding"
-  role = aws_iam_role.bedrock_agent.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect   = "Allow"
-      Action   = ["bedrock:InvokeTool"]
-      Resource = "arn:aws:bedrock:*:*:system-tool/amazon.nova_grounding"
-    }]
-  })
-}
+# Web Grounding IAM permissions are configured in main.tf (bedrock_agent_policy).

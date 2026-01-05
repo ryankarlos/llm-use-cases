@@ -220,6 +220,90 @@ class TestSendLetter:
         assert result["letter_type"] == "confirmation"
 
 
+class TestFindNearbyHospitals:
+    """Tests for find_nearby_hospitals action."""
+    
+    def test_find_hospitals_missing_address(self):
+        """Test error when address is missing."""
+        from lambda_actions import find_nearby_hospitals
+        
+        result = find_nearby_hospitals({
+            "patient_name": "John Smith"
+        })
+        
+        assert result["success"] is False
+        assert "address" in result["error"].lower()
+    
+    @patch("lambda_actions.location")
+    def test_find_hospitals_with_mock_data(self, mock_location):
+        """Test hospital search falls back to mock data."""
+        from lambda_actions import find_nearby_hospitals
+        
+        # Simulate Location Service not configured
+        mock_location.geocode.side_effect = Exception("AccessDenied")
+        
+        result = find_nearby_hospitals({
+            "patient_name": "John Smith",
+            "patient_address": "10 Downing Street, London SW1A 2AA"
+        })
+        
+        assert result["success"] is True
+        assert "nearby_hospitals" in result
+        assert len(result["nearby_hospitals"]) > 0
+        assert result["patient_name"] == "John Smith"
+    
+    @patch("lambda_actions.location")
+    def test_find_hospitals_with_location_service(self, mock_location):
+        """Test hospital search with Location Service."""
+        from lambda_actions import find_nearby_hospitals
+        
+        # Mock geocode response
+        mock_location.geocode.return_value = {
+            "ResultItems": [{
+                "Position": [-0.1276, 51.5074]  # London coordinates
+            }]
+        }
+        
+        # Mock search_nearby response
+        mock_location.search_nearby.return_value = {
+            "ResultItems": [
+                {
+                    "Title": "St Thomas' Hospital",
+                    "Address": {"Label": "Westminster Bridge Rd, London SE1 7EH"},
+                    "Distance": 1200,  # meters
+                    "Contacts": {"Phones": [{"Value": "020 7188 7188"}]},
+                    "Categories": ["hospital"]
+                }
+            ]
+        }
+        
+        result = find_nearby_hospitals({
+            "patient_name": "John Smith",
+            "patient_address": "10 Downing Street, London SW1A 2AA",
+            "max_results": 5
+        })
+        
+        assert result["success"] is True
+        assert len(result["nearby_hospitals"]) == 1
+        assert result["nearby_hospitals"][0]["name"] == "St Thomas' Hospital"
+        assert result["nearby_hospitals"][0]["distance_km"] == 1.2
+    
+    def test_mock_hospitals_data_structure(self):
+        """Test mock hospital data has correct structure."""
+        from lambda_actions import _mock_nearby_hospitals
+        
+        result = _mock_nearby_hospitals("Test Patient", "Test Address")
+        
+        assert result["success"] is True
+        assert "nearby_hospitals" in result
+        
+        for hospital in result["nearby_hospitals"]:
+            assert "name" in hospital
+            assert "address" in hospital
+            assert "distance_km" in hospital
+            assert "phone" in hospital
+
+
 class TestLambdaHandler:
     """Tests for main Lambda handler."""
     
@@ -253,3 +337,50 @@ class TestLambdaHandler:
         
         body = json.loads(result["response"]["responseBody"]["application/json"]["body"])
         assert "available_slots" in body
+    
+    @patch("lambda_actions.location")
+    def test_handler_hospital_search(self, mock_location):
+        """Test handler routes to hospital search action."""
+        from lambda_actions import handler
+        
+        # Mock to use fallback data
+        mock_location.geocode.side_effect = Exception("Not configured")
+        
+        event = {
+            "actionGroup": "BookingAgent",
+            "apiPath": "/find-nearby-hospitals",
+            "requestBody": {
+                "content": {
+                    "application/json": {
+                        "properties": [
+                            {"name": "patient_name", "value": "John Smith"},
+                            {"name": "patient_address", "value": "London SW1A 2AA"}
+                        ]
+                    }
+                }
+            }
+        }
+        
+        result = handler(event, None)
+        
+        assert result["messageVersion"] == "1.0"
+        assert result["response"]["httpStatusCode"] == 200
+        
+        body = json.loads(result["response"]["responseBody"]["application/json"]["body"])
+        assert body["success"] is True
+        assert "nearby_hospitals" in body
+    
+    def test_handler_unknown_action(self):
+        """Test handler returns error for unknown action."""
+        from lambda_actions import handler
+        
+        event = {
+            "actionGroup": "BookingAgent",
+            "apiPath": "/unknown-action",
+            "requestBody": {"content": {"application/json": {"properties": []}}}
+        }
+        
+        result = handler(event, None)
+        
+        body = json.loads(result["response"]["responseBody"]["application/json"]["body"])
+        assert "error" in body

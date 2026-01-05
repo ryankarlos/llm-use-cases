@@ -196,7 +196,26 @@ resource "aws_iam_role_policy" "bedrock_agent" {
           "bedrock:InvokeModel",
           "bedrock:InvokeModelWithResponseStream"
         ]
-        Resource = "arn:aws:bedrock:${var.aws_region}::foundation-model/*"
+        Resource = [
+          "arn:aws:bedrock:${var.aws_region}::foundation-model/*",
+          "arn:aws:bedrock:us-east-1::foundation-model/*",
+          "arn:aws:bedrock:us-west-2::foundation-model/*"
+        ]
+      },
+      {
+        # Cross-region inference profiles for Nova Premier
+        Effect = "Allow"
+        Action = [
+          "bedrock:InvokeModel",
+          "bedrock:InvokeModelWithResponseStream"
+        ]
+        Resource = "arn:aws:bedrock:*:${data.aws_caller_identity.current.account_id}:inference-profile/*"
+      },
+      {
+        # Web Grounding system tool
+        Effect   = "Allow"
+        Action   = ["bedrock:InvokeTool"]
+        Resource = "arn:aws:bedrock:*:*:system-tool/amazon.nova_grounding"
       },
       {
         Effect   = "Allow"
