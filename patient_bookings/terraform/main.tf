@@ -17,7 +17,7 @@ provider "aws" {
 
 # S3 bucket for demo files (audio, etc.)
 resource "aws_s3_bucket" "demo" {
-  bucket        = "${var.project_name}-${data.aws_caller_identity.current.account_id}"
+  bucket        = "${var.project_name}-demo-${data.aws_caller_identity.current.account_id}"
   force_destroy = true  # Allow easy cleanup for demo
 }
 
@@ -50,9 +50,7 @@ resource "aws_dynamodb_table" "bookings" {
   }
 }
 
-# Lambda for agent actions
-# Note: SnapStart is only available for Java/.NET. For Python, we use small memory
-# and keep the code minimal for fast cold starts.
+# Lambda for agent actions with X-Ray tracing
 resource "aws_lambda_function" "actions" {
   function_name = "${var.project_name}-actions"
   role          = aws_iam_role.lambda.arn
@@ -63,6 +61,11 @@ resource "aws_lambda_function" "actions" {
 
   filename         = data.archive_file.lambda.output_path
   source_code_hash = data.archive_file.lambda.output_base64sha256
+
+  # Enable X-Ray active tracing
+  tracing_config {
+    mode = "Active"
+  }
 
   environment {
     variables = {
@@ -98,6 +101,12 @@ resource "aws_iam_role" "lambda" {
 resource "aws_iam_role_policy_attachment" "lambda_basic" {
   role       = aws_iam_role.lambda.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+# X-Ray tracing permissions
+resource "aws_iam_role_policy_attachment" "lambda_xray" {
+  role       = aws_iam_role.lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
 }
 
 resource "aws_iam_role_policy" "lambda_dynamodb" {

@@ -23,3 +23,6 @@ mocks/
 import.tf
 venv
 *.pem
+__pycache__
+*.pyc
+lambda.zip
