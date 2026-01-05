@@ -1,11 +1,11 @@
 # Bedrock Agent for NHS Patient Booking Demo
-# Simple agent with booking actions
+# Uses Nova Premier with Web Grounding for real-time search
 
-# Supervisor Agent
+# Supervisor Agent with Nova Premier and Web Search
 resource "aws_bedrockagent_agent" "supervisor" {
   agent_name                  = "${var.project_name}-agent"
   agent_resource_role_arn     = aws_iam_role.bedrock_agent.arn
-  foundation_model            = "amazon.nova-lite-v1:0"
+  foundation_model            = "us.amazon.nova-premier-v1:0"  # Cross-region inference profile for web grounding
   idle_session_ttl_in_seconds = 600
   prepare_agent               = true
 
@@ -14,9 +14,8 @@ resource "aws_bedrockagent_agent" "supervisor" {
 
     IMPORTANT RULES:
     1. You do NOT provide medical advice - only help with bookings
-    2. For NHS information, search the knowledge base first, then direct to nhs.uk if needed
-    3. Be polite, professional, and reassuring
-    4. Keep patients updated on what you're doing
+    2. Be polite, professional, and reassuring
+    3. Keep patients updated on what you're doing
 
     BOOKING WORKFLOW:
     1. Understand the patient's booking need (GP or specialist)
@@ -25,16 +24,31 @@ resource "aws_bedrockagent_agent" "supervisor" {
     4. Approve it using approveBooking action
     5. Send confirmation using sendConfirmation action
 
+    FINDING NEARBY HOSPITALS:
+    When a patient asks about nearby hospitals, clinics, or NHS facilities:
+    1. First ask for their full name if not already provided
+    2. Ask for their full address including postcode (e.g., "10 Downing Street, London SW1A 2AA")
+    3. Use the findNearbyHospitals action with their name and address
+    4. Present the results showing hospital name, distance, and services available
+
+    WEB SEARCH:
+    You have access to real-time web search. Use it to:
+    - Find current NHS service information and opening hours
+    - Look up specific hospital or clinic details
+    - Get up-to-date NHS guidance and policies
+    - Search for NHS services in specific areas
+    Always cite your sources when providing web search results.
+
     EMERGENCY: For urgent symptoms (chest pain, breathing difficulty, stroke signs), 
     immediately advise calling 999 - do NOT proceed with booking.
 
     When patients ask about NHS services, appointment types, or patient flow:
-    - Search the knowledge base for relevant information
-    - Provide helpful guidance based on NHS documentation
+    - First search the knowledge base for relevant information
+    - Use web search for current/real-time information
     - Always clarify you cannot give medical advice
   EOT
 
-  description = "NHS Patient Booking Assistant"
+  description = "NHS Patient Booking Assistant with Web Search"
 }
 
 # Prepare agent after creation
@@ -167,11 +181,49 @@ resource "aws_bedrockagent_agent_action_group" "booking" {
             responses = { "200" = { description = "Confirmation sent" } }
           }
         }
+        "/find-nearby-hospitals" = {
+          post = {
+            operationId = "findNearbyHospitals"
+            description = "Find nearby NHS hospitals and clinics based on patient address. IMPORTANT: You must ask the patient for their name and full address (including postcode) before calling this action."
+            requestBody = {
+              required = true
+              content = {
+                "application/json" = {
+                  schema = {
+                    type = "object"
+                    properties = {
+                      patient_name    = { type = "string", description = "Patient full name" }
+                      patient_address = { type = "string", description = "Patient full address including postcode (e.g., '10 Downing Street, London SW1A 2AA')" }
+                      max_results     = { type = "integer", description = "Maximum number of hospitals to return (default 5)" }
+                    }
+                    required = ["patient_name", "patient_address"]
+                  }
+                }
+              }
+            }
+            responses = { "200" = { description = "List of nearby hospitals with distance and contact info" } }
+          }
+        }
       }
     })
   }
 }
 
-# Note: Web search/grounding can be enabled at inference time using Nova's 
-# nova_grounding system tool when invoking the model directly.
-# For this demo, the agent directs users to nhs.uk for health information.
+# Note: Web Grounding is enabled via Nova Premier (us.amazon.nova-premier-v1:0).
+# The nova_grounding system tool is automatically available for real-time web search.
+# Web Grounding requires the bedrock:InvokeTool permission for the system tool.
+
+# IAM permission for Web Grounding
+resource "aws_iam_role_policy" "bedrock_agent_web_grounding" {
+  name = "${var.project_name}-agent-web-grounding"
+  role = aws_iam_role.bedrock_agent.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["bedrock:InvokeTool"]
+      Resource = "arn:aws:bedrock:*:*:system-tool/amazon.nova_grounding"
+    }]
+  })
+}

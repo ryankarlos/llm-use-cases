@@ -132,6 +132,27 @@ resource "aws_iam_role_policy" "lambda_dynamodb" {
   })
 }
 
+# Amazon Location Service permissions for hospital search
+resource "aws_iam_role_policy" "lambda_location" {
+  name = "${var.project_name}-lambda-location"
+  role = aws_iam_role.lambda.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "geo:SearchPlaceIndexForText",
+        "geo:SearchPlaceIndexForPosition",
+        "geo-places:Geocode",
+        "geo-places:SearchNearby",
+        "geo-places:SearchText"
+      ]
+      Resource = "*"
+    }]
+  })
+}
+
 # Lambda permission for Bedrock Agent
 resource "aws_lambda_permission" "bedrock" {
   statement_id  = "AllowBedrock"

@@ -12,7 +12,7 @@ The NHS Patient Booking Assistant provides a conversational interface where pati
 
 The solution uses Amazon Bedrock Agents to orchestrate the conversation flow. When a patient makes a request, the agent powered by Amazon Nova Lite interprets the intent, assesses urgency, and invokes the appropriate actions through AWS Lambda. A knowledge base backed by Amazon S3 Vectors provides the agent with NHS-specific information about appointment types, services available at different facilities, and patient flow procedures. Amazon Bedrock Guardrails ensure the assistant stays within appropriate boundaries, blocking any attempts to solicit medical advice and redirecting emergency situations to 999.
 
-![NHS Patient Booking Architecture](generated-diagrams/nhs_booking_architecture_wide.png)
+![NHS Patient Booking Architecture](generated-diagrams/nhs_booking_architecture_new.png)
 
 The architecture incorporates several advanced Bedrock features to optimize performance and cost. Intelligent Prompt Routing dynamically selects between models based on query complexity, using Nova Lite for straightforward booking requests and routing more nuanced queries appropriately. Prompt Caching reduces latency and token costs by caching the system instructions and NHS knowledge context that remain constant across conversations. CloudWatch Generative AI Observability provides visibility into model invocations, token usage, and response quality metrics.
 
@@ -430,17 +430,195 @@ eval "$(terraform output -raw env_vars)"
 
 ## Running the Demo Application
 
-The demo application provides a Streamlit interface for interacting with the booking assistant. Install the required Python packages and start the application.
+The demo application provides a Streamlit interface for interacting with the booking assistant. The scripts are organized in the `scripts/` directory for easy access. Install the required Python packages and start the application from the project root.
 
 ```bash
-cd ../app
+cd patient_bookings
 pip install streamlit boto3
-streamlit run streamlit_app.py
+streamlit run scripts/streamlit_app.py
 ```
 
-The application opens in your browser and presents a chat interface. You can type messages to the assistant and see responses in real time as the agent processes your requests.
+The application opens in your browser at http://localhost:8501 and presents a chat interface. The sidebar allows you to switch between Single Agent mode and Multi-Agent Supervisor mode, letting you compare the two approaches. You can type messages to the assistant and see responses in real time as the agent processes your requests, with expandable trace information showing the routing decisions and Lambda invocations.
+
+For command-line testing without the UI, use the test script to invoke agents directly.
+
+```bash
+# Test the multi-agent supervisor
+python scripts/test_multi_agent.py --agent supervisor
+
+# Test the single agent
+python scripts/test_multi_agent.py --agent single
+
+# Test both and compare
+python scripts/test_multi_agent.py --agent both
+
+# Custom message
+python scripts/test_multi_agent.py --message "I need an urgent appointment today"
+```
 
 A typical booking conversation demonstrates the intelligent availability handling. When you request a specific slot that is unavailable, the assistant proactively offers alternatives rather than simply rejecting the request.
 
 ```
 Patient: I'd like to book an appointment with Dr. Williams for Monday morning.
+
+[ROUTING TO] SchedulingSpecialist
+[ACTION] SchedulingActions/check-availability
+[LAMBDA] {"available_slots": [{"date": "2026-01-12", "time": "10:00", ...}]}
+
+Assistant: I found several available slots with Dr. Williams. Monday morning is 
+fully booked, but I have these alternatives:
+
+With Dr. Williams:
+- Tuesday 14th January at 10:00 AM
+- Thursday 16th January at 10:00 AM
+
+With Dr. Patel (earlier availability):
+- Monday 12th January at 2:30 PM
+
+At Riverside Health Centre (1.2 miles away):
+- Wednesday 8th January at 11:00 AM with Dr. Chen
+
+Which option works best for you?
+
+Patient: I'll take the Tuesday slot with Dr. Williams please.
+
+[ACTION] SchedulingActions/create-booking
+[LAMBDA] {"booking_id": "NHS-20260105-A1B2C3", "status": "pending"}
+[ACTION] SchedulingActions/approve-booking
+[LAMBDA] {"approved": true, "booking_id": "NHS-20260105-A1B2C3"}
+
+Assistant: Your appointment is confirmed. Here are the details:
+
+- Reference: NHS-20260105-A1B2C3
+- Date: Tuesday, 14th January 2026
+- Time: 10:00 AM
+- Doctor: Dr. Williams
+- Location: Main Surgery
+
+Please arrive 10 minutes early and bring your NHS number and any relevant 
+medical records. I've sent a confirmation to your email and phone.
+```
+
+The trace output shows the multi-agent routing in action. The supervisor identifies this as a scheduling request and routes to the SchedulingSpecialist collaborator. That agent then invokes the Lambda actions to check availability, create the booking, and approve it. The conversation history flows between agents so the scheduling agent has full context of the patient's preferences.
+
+
+
+## Multi-Agent Collaboration Architecture
+
+The solution implements Amazon Bedrock's multi-agent collaboration feature, where a supervisor agent orchestrates specialist collaborator agents. This architecture provides several advantages over a single monolithic agent. Each specialist agent has focused instructions and capabilities, making them more reliable at their specific tasks. The supervisor handles routing logic and conversation flow, while collaborators execute domain-specific operations.
+
+The multi-agent setup consists of four agents working together. The Supervisor Agent acts as the patient's primary point of contact, greeting them, understanding their needs, and routing requests to the appropriate specialist. The Triage Agent assesses urgency based on symptom descriptions, categorizing requests as emergency, urgent, or routine. For emergency situations, it immediately advises calling 999 rather than proceeding with booking. The Scheduling Agent handles all booking operations through Lambda action groups, checking availability, creating bookings, and managing confirmations. The Information Agent answers questions about NHS services by searching the knowledge base, providing guidance on appointment types, what to bring, and patient flow procedures.
+
+
+```hcl
+resource "aws_bedrockagent_agent" "supervisor_multi" {
+  agent_name                  = "${var.project_name}-supervisor"
+  agent_resource_role_arn     = aws_iam_role.bedrock_agent.arn
+  agent_collaboration         = "SUPERVISOR"
+  foundation_model            = "amazon.nova-lite-v1:0"
+  idle_session_ttl_in_seconds = 600
+
+  instruction = <<-EOT
+    You are the NHS Patient Booking Supervisor. You coordinate a team of specialist agents.
+
+    YOUR TEAM:
+    1. TRIAGE AGENT - Assesses urgency of patient requests
+    2. SCHEDULING AGENT - Handles availability and bookings  
+    3. INFORMATION AGENT - Answers questions about NHS services
+
+    WORKFLOW:
+    1. Greet the patient warmly
+    2. If patient describes symptoms or health concerns, route to TRIAGE AGENT
+    3. For booking requests, route to SCHEDULING AGENT
+    4. For questions about NHS services, route to INFORMATION AGENT
+    5. Summarize outcomes and confirm next steps with patient
+  EOT
+}
+
+
+resource "aws_bedrockagent_agent_collaborator" "scheduling" {
+  agent_id                   = aws_bedrockagent_agent.supervisor_multi.agent_id
+  collaborator_name          = "SchedulingSpecialist"
+  collaboration_instruction  = "Route booking requests to this agent. It will check availability, offer alternatives, and create bookings."
+  relay_conversation_history = "TO_COLLABORATOR"
+
+  agent_descriptor {
+    alias_arn = aws_bedrockagent_agent_alias.scheduling_live.agent_alias_arn
+  }
+}
+```
+
+The `relay_conversation_history` setting determines how much context flows to collaborators. Setting it to `TO_COLLABORATOR` passes the full conversation history, allowing the scheduling agent to understand previous exchanges about patient preferences and urgency assessments. This context sharing is essential for coherent multi-turn conversations where information gathered by one agent informs the actions of another.
+
+
+
+## Bedrock Flows for Workflow Orchestration
+
+In addition to multi-agent collaboration, the solution includes a Bedrock Flow that provides an alternative orchestration approach. Bedrock Flows define explicit workflow graphs with nodes for agents, conditions, and data transformations. While multi-agent collaboration uses the supervisor's reasoning to route requests dynamically, flows provide deterministic routing based on defined conditions.
+
+The booking flow implements a triage-first pattern where every request passes through urgency assessment before scheduling. The flow starts with an input node that receives the patient's request, then routes to the triage agent node for assessment. A condition node examines the triage response and routes emergency cases directly to an output node advising 999, while urgent and routine cases proceed to the scheduling agent node. The scheduling agent's response flows to the final output node.
+
+
+```hcl
+resource "aws_bedrockagent_flow" "booking_flow" {
+  name               = "${var.project_name}-booking-flow"
+  execution_role_arn = aws_iam_role.flow_role.arn
+
+  definition {
+    node {
+      name = "FlowInput"
+      type = "Input"
+      configuration { input {} }
+      output { name = "document" type = "String" }
+    }
+
+    node {
+      name = "TriageAssessment"
+      type = "Agent"
+      configuration {
+        agent { agent_alias_arn = aws_bedrockagent_agent_alias.triage_live.agent_alias_arn }
+      }
+      input { name = "agentInputText" type = "String" expression = "$.data" }
+      output { name = "agentResponse" type = "String" }
+    }
+
+    node {
+      name = "UrgencyRouter"
+      type = "Condition"
+      configuration {
+        condition {
+          condition { name = "IsEmergency" expression = "emergency" }
+          condition { name = "IsUrgent" expression = "urgent" }
+          condition { name = "IsRoutine" expression = "default" }
+        }
+      }
+    }
+  }
+}
+```
+
+
+Flows are particularly useful when you need guaranteed execution paths, audit trails of decision points, or integration with external systems at specific workflow stages. The booking flow could be extended to include human approval nodes for certain appointment types, integration with external scheduling systems, or notification triggers at specific workflow stages.
+
+
+## Conclusion
+
+Building an intelligent patient booking assistant with Amazon Bedrock demonstrates how generative AI can transform healthcare administrative workflows. The combination of natural language understanding, knowledge retrieval, and action execution creates an experience that feels conversational while handling complex booking logic behind the scenes.
+
+The multi-agent architecture provides flexibility and maintainability. Each specialist agent can be updated independently, new capabilities can be added by creating additional collaborators, and the supervisor's routing logic can evolve without affecting the underlying action implementations. S3 Vectors provides cost-effective knowledge storage that scales with your content, while prompt caching and intelligent routing optimize both latency and cost.
+
+
+The safety guardrails built into this solution are essential for healthcare applications. The agent consistently refuses to provide medical advice, redirects emergencies appropriately, and maintains professional boundaries while still being helpful and reassuring. These guardrails demonstrate that generative AI can be deployed responsibly in sensitive domains when proper controls are in place.
+
+To get started with this solution, clone the repository and follow the deployment instructions in the README. The Terraform configuration creates all required resources, and the Streamlit application provides an immediate way to interact with the booking assistant. Experiment with different conversation flows, test the multi-agent routing, and explore how the knowledge base enhances responses to NHS-related questions.
+
+
+## References
+
+- [Amazon Bedrock Agents Documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/agents.html)
+- [Multi-Agent Collaboration](https://docs.aws.amazon.com/bedrock/latest/userguide/agents-multi-agent-collaboration.html)
+- [Bedrock Flows](https://docs.aws.amazon.com/bedrock/latest/userguide/flows.html)
+- [S3 Vectors for Knowledge Bases](https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base-s3-vectors.html)
+- [Amazon Nova Models](https://aws.amazon.com/ai/generative-ai/nova/)
+- [Prompt Caching](https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html)
+- [Intelligent Prompt Routing](https://docs.aws.amazon.com/bedrock/latest/userguide/intelligent-prompt-routing.html)

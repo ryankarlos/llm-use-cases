@@ -1,5 +1,6 @@
 # Multi-Agent Collaboration for NHS Patient Booking
 # Supervisor agent orchestrates specialist collaborator agents
+# Uses Nova Premier for supervisor (web search) and Nova Lite for collaborators
 
 # ============================================================================
 # COLLABORATOR AGENTS - Specialist agents for specific tasks
@@ -61,6 +62,7 @@ resource "aws_bedrockagent_agent" "scheduling" {
     2. Present multiple options to patients (different times, doctors, locations)
     3. Handle booking conflicts by offering alternatives
     4. Create and confirm bookings
+    5. Find nearby hospitals when patients need alternatives
 
     WHEN SLOTS ARE UNAVAILABLE:
     - Never simply reject a request
@@ -68,6 +70,13 @@ resource "aws_bedrockagent_agent" "scheduling" {
     - Suggest different doctors with earlier availability
     - Recommend nearby clinics or hospitals
     - For urgent cases, escalate to find emergency slots
+
+    FINDING NEARBY HOSPITALS:
+    When a patient needs to find nearby NHS facilities:
+    1. Ask for their full name if not provided
+    2. Ask for their full address including postcode
+    3. Use findNearbyHospitals action with their details
+    4. Present results with distance and available services
 
     BOOKING CONFIRMATION:
     - Verify all patient details before confirming
@@ -169,6 +178,29 @@ resource "aws_bedrockagent_agent_action_group" "scheduling_actions" {
             responses = { "200" = { description = "Booking approved" } }
           }
         }
+        "/find-nearby-hospitals" = {
+          post = {
+            operationId = "findNearbyHospitals"
+            description = "Find nearby NHS hospitals and clinics. Ask patient for name and full address with postcode first."
+            requestBody = {
+              required = true
+              content = {
+                "application/json" = {
+                  schema = {
+                    type = "object"
+                    properties = {
+                      patient_name    = { type = "string", description = "Patient full name" }
+                      patient_address = { type = "string", description = "Full address with postcode" }
+                      max_results     = { type = "integer" }
+                    }
+                    required = ["patient_name", "patient_address"]
+                  }
+                }
+              }
+            }
+            responses = { "200" = { description = "Nearby hospitals" } }
+          }
+        }
       }
     })
   }
@@ -218,14 +250,14 @@ resource "aws_bedrockagent_agent_knowledge_base_association" "info_kb" {
 }
 
 # ============================================================================
-# SUPERVISOR AGENT - Orchestrates collaborator agents
+# SUPERVISOR AGENT - Orchestrates collaborator agents with Web Search
 # ============================================================================
 
 resource "aws_bedrockagent_agent" "supervisor_multi" {
   agent_name                  = "${var.project_name}-supervisor"
   agent_resource_role_arn     = aws_iam_role.bedrock_agent.arn
   agent_collaboration         = "SUPERVISOR"
-  foundation_model            = "amazon.nova-lite-v1:0"
+  foundation_model            = "us.amazon.nova-premier-v1:0"  # Nova Premier for web grounding
   idle_session_ttl_in_seconds = 600
   prepare_agent               = false # Will prepare after collaborators are added
 
@@ -247,7 +279,16 @@ resource "aws_bedrockagent_agent" "supervisor_multi" {
        - Route to SCHEDULING AGENT to find slots and book
     4. For questions about NHS services:
        - Route to INFORMATION AGENT
+       - Use web search for current/real-time NHS information
     5. Summarize outcomes and confirm next steps with patient
+
+    WEB SEARCH:
+    You have access to real-time web search. Use it to:
+    - Find current NHS service information and opening hours
+    - Look up specific hospital or clinic details
+    - Get up-to-date NHS guidance and policies
+    - Search for NHS services in specific areas
+    Always cite your sources when providing web search results.
 
     IMPORTANT:
     - Keep the patient informed about what you're doing
@@ -256,7 +297,7 @@ resource "aws_bedrockagent_agent" "supervisor_multi" {
     - Ensure smooth handoffs between agents
   EOT
 
-  description = "Supervisor agent orchestrating NHS booking workflow"
+  description = "Supervisor agent with web search orchestrating NHS booking workflow"
 }
 
 resource "aws_bedrockagent_agent_alias" "supervisor_multi_live" {
@@ -285,6 +326,8 @@ resource "aws_bedrockagent_agent_collaborator" "triage" {
   agent_descriptor {
     alias_arn = aws_bedrockagent_agent_alias.triage_live.agent_alias_arn
   }
+
+  depends_on = [aws_iam_role_policy.bedrock_agent_collaborator]
 }
 
 resource "aws_bedrockagent_agent_collaborator" "scheduling" {
@@ -296,6 +339,8 @@ resource "aws_bedrockagent_agent_collaborator" "scheduling" {
   agent_descriptor {
     alias_arn = aws_bedrockagent_agent_alias.scheduling_live.agent_alias_arn
   }
+
+  depends_on = [aws_iam_role_policy.bedrock_agent_collaborator]
 }
 
 resource "aws_bedrockagent_agent_collaborator" "information" {
@@ -307,6 +352,8 @@ resource "aws_bedrockagent_agent_collaborator" "information" {
   agent_descriptor {
     alias_arn = aws_bedrockagent_agent_alias.information_live.agent_alias_arn
   }
+
+  depends_on = [aws_iam_role_policy.bedrock_agent_collaborator]
 }
 
 # Prepare supervisor after collaborators are associated
@@ -336,7 +383,9 @@ resource "aws_bedrockagent_flow" "booking_flow" {
     node {
       name = "FlowInput"
       type = "Input"
-      configuration { input {} }
+      configuration {
+        input {}
+      }
       output {
         name = "document"
         type = "String"
@@ -394,7 +443,9 @@ resource "aws_bedrockagent_flow" "booking_flow" {
     node {
       name = "EmergencyOutput"
       type = "Output"
-      configuration { output {} }
+      configuration {
+        output {}
+      }
       input {
         name       = "document"
         type       = "String"
@@ -426,7 +477,9 @@ resource "aws_bedrockagent_flow" "booking_flow" {
     node {
       name = "FlowOutput"
       type = "Output"
-      configuration { output {} }
+      configuration {
+        output {}
+      }
       input {
         name       = "document"
         type       = "String"
@@ -579,15 +632,12 @@ resource "aws_iam_role_policy" "bedrock_agent_collaborator" {
         Effect = "Allow"
         Action = [
           "bedrock:InvokeAgent",
-          "bedrock:GetAgentAlias"
+          "bedrock:GetAgentAlias",
+          "bedrock:GetAgent"
         ]
         Resource = [
-          aws_bedrockagent_agent.triage.agent_arn,
-          aws_bedrockagent_agent.scheduling.agent_arn,
-          aws_bedrockagent_agent.information.agent_arn,
-          "${aws_bedrockagent_agent.triage.agent_arn}/*",
-          "${aws_bedrockagent_agent.scheduling.agent_arn}/*",
-          "${aws_bedrockagent_agent.information.agent_arn}/*"
+          "arn:aws:bedrock:${var.aws_region}:${data.aws_caller_identity.current.account_id}:agent/*",
+          "arn:aws:bedrock:${var.aws_region}:${data.aws_caller_identity.current.account_id}:agent-alias/*"
         ]
       }
     ]
