@@ -1,0 +1,19 @@
+# AWS SDK
+boto3>=1.35.0
+
+# Streamlit Demo App
+streamlit>=1.40.0
+
+# Audio processing (optional - for voice features)
+pydub>=0.25.0
+
+# Testing
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+moto>=5.0.0
+
+# Load testing
+locust>=2.20.0
+
+# Utilities
+python-dotenv>=1.0.0
