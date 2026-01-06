@@ -1,0 +1,44 @@
+{
+  "job_roles": {
+    "data_scientist": {
+      "role_id": "data_scientist",
+      "title": "Data Scientist",
+      "department": "AI",
+      "required_skills": ["Python", "Machine Learning", "Statistics", "SQL", "Data Analysis"],
+      "preferred_skills": ["Deep Learning", "NLP", "Computer Vision", "Spark", "TensorFlow", "PyTorch"],
+      "min_experience_years": 3,
+      "education_requirements": ["Bachelor's in Computer Science", "Master's in Data Science", "PhD"],
+      "description": "Analyze complex datasets and build predictive models"
+    },
+    "data_engineer": {
+      "role_id": "data_engineer",
+      "title": "Data Engineer",
+      "department": "AI",
+      "required_skills": ["Python", "SQL", "ETL", "Data Pipelines", "AWS"],
+      "preferred_skills": ["Spark", "Airflow", "Kafka", "Snowflake", "dbt", "Terraform"],
+      "min_experience_years": 3,
+      "education_requirements": ["Bachelor's in Computer Science", "Bachelor's in Engineering"],
+      "description": "Build and maintain data infrastructure and pipelines"
+    },
+    "ml_engineer": {
+      "role_id": "ml_engineer",
+      "title": "Machine Learning Engineer",
+      "department": "AI",
+      "required_skills": ["Python", "Machine Learning", "MLOps", "Docker", "AWS"],
+      "preferred_skills": ["Kubernetes", "SageMaker", "MLflow", "Feature Stores", "Model Serving"],
+      "min_experience_years": 4,
+      "education_requirements": ["Bachelor's in Computer Science", "Master's in ML/AI"],
+      "description": "Deploy and operationalize machine learning models at scale"
+    },
+    "cloud_architect": {
+      "role_id": "cloud_architect",
+      "title": "Cloud Architect",
+      "department": "AI",
+      "required_skills": ["AWS", "Cloud Architecture", "Infrastructure as Code", "Security", "Networking"],
+      "preferred_skills": ["Terraform", "Kubernetes", "Serverless", "Multi-cloud", "Cost Optimization"],
+      "min_experience_years": 5,
+      "education_requirements": ["Bachelor's in Computer Science", "AWS Solutions Architect"],
+      "description": "Design and implement cloud infrastructure for AI workloads"
+    }
+  }
+}

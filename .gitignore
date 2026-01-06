@@ -20,6 +20,7 @@ mocks/
 # lambda_function.zip
 import.tf
 venv
+.venv
 *.pem
 __pycache__
 *.pyc

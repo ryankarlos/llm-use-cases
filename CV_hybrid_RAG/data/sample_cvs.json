@@ -1,0 +1,68 @@
+{
+  "candidates": [
+    {
+      "candidate_id": "cand_001",
+      "candidate_name": "Sarah Chen",
+      "skills": ["Python", "Machine Learning", "Statistics", "SQL", "TensorFlow", "Deep Learning", "NLP", "Data Analysis"],
+      "experience_years": 5,
+      "experience_summary": "Senior Data Scientist at TechCorp with 5 years experience building ML models for customer analytics and NLP applications.",
+      "skill_connections": 12
+    },
+    {
+      "candidate_id": "cand_002",
+      "candidate_name": "Marcus Johnson",
+      "skills": ["Python", "SQL", "ETL", "Data Pipelines", "AWS", "Spark", "Airflow", "Kafka"],
+      "experience_years": 4,
+      "experience_summary": "Data Engineer at DataFlow Inc. specializing in building scalable data pipelines and real-time streaming architectures.",
+      "skill_connections": 10
+    },
+    {
+      "candidate_id": "cand_003",
+      "candidate_name": "Emily Rodriguez",
+      "skills": ["Python", "Machine Learning", "MLOps", "Docker", "AWS", "Kubernetes", "SageMaker", "MLflow"],
+      "experience_years": 6,
+      "experience_summary": "ML Engineer at CloudAI Labs with expertise in deploying and scaling ML models in production environments.",
+      "skill_connections": 14
+    },
+    {
+      "candidate_id": "cand_004",
+      "candidate_name": "David Kim",
+      "skills": ["AWS", "Cloud Architecture", "Infrastructure as Code", "Security", "Terraform", "Kubernetes", "Networking"],
+      "experience_years": 7,
+      "experience_summary": "Cloud Architect at Enterprise Solutions designing multi-region AWS infrastructure for AI/ML workloads.",
+      "skill_connections": 11
+    },
+    {
+      "candidate_id": "cand_005",
+      "candidate_name": "Priya Patel",
+      "skills": ["Python", "Machine Learning", "Statistics", "R", "Data Analysis", "Computer Vision"],
+      "experience_years": 3,
+      "experience_summary": "Data Scientist at HealthTech startup focusing on medical image analysis and predictive healthcare models.",
+      "skill_connections": 8
+    },
+    {
+      "candidate_id": "cand_006",
+      "candidate_name": "James Wilson",
+      "skills": ["Python", "SQL", "AWS", "Docker", "ETL", "dbt", "Snowflake"],
+      "experience_years": 2,
+      "experience_summary": "Junior Data Engineer at FinanceData Corp building data warehousing solutions and ETL pipelines.",
+      "skill_connections": 6
+    },
+    {
+      "candidate_id": "cand_007",
+      "candidate_name": "Lisa Thompson",
+      "skills": ["Python", "Machine Learning", "Deep Learning", "PyTorch", "NLP", "Statistics", "SQL"],
+      "experience_years": 4,
+      "experience_summary": "ML Researcher at AI Research Lab working on transformer models and large language model fine-tuning.",
+      "skill_connections": 9
+    },
+    {
+      "candidate_id": "cand_008",
+      "candidate_name": "Ahmed Hassan",
+      "skills": ["AWS", "Azure", "Cloud Architecture", "Security", "Networking", "Serverless", "Cost Optimization"],
+      "experience_years": 5,
+      "experience_summary": "Senior Cloud Engineer at MultiCloud Systems with multi-cloud expertise and security certifications.",
+      "skill_connections": 10
+    }
+  ]
+}
