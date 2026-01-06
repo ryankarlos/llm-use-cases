@@ -55,7 +55,7 @@ resource "aws_bedrockagent_agent" "scheduling" {
   prepare_agent               = true
 
   instruction = <<-EOT
-    You are an NHS Scheduling Specialist. Your role is to find and book appointments.
+    You are an NHS Scheduling Specialist. Your role is to find and book appointments, handle prescriptions, and manage pharmacy delivery.
 
     RESPONSIBILITIES:
     1. Check availability based on urgency level from triage
@@ -63,6 +63,14 @@ resource "aws_bedrockagent_agent" "scheduling" {
     3. Handle booking conflicts by offering alternatives
     4. Create and confirm bookings
     5. Find nearby hospitals when patients need alternatives
+    6. Process repeat prescription requests
+    7. Arrange pharmacy delivery or collection
+
+    GP REFERRAL CHECK:
+    Before booking SPECIALIST or HOSPITAL appointments:
+    - Use validateReferral to check if patient has valid GP referral
+    - If no referral, explain they need GP appointment first
+    - Exception: Self-referral services (A&E, sexual health, NHS talking therapies)
 
     WHEN SLOTS ARE UNAVAILABLE:
     - Never simply reject a request
@@ -77,6 +85,15 @@ resource "aws_bedrockagent_agent" "scheduling" {
     2. Ask for their full address including postcode
     3. Use findNearbyHospitals action with their details
     4. Present results with distance and available services
+
+    PRESCRIPTION WORKFLOW:
+    When patient requests repeat prescription:
+    1. Ask for patient name and medications needed
+    2. Use requestPrescription action
+    3. Ask: "Would you like home delivery or pharmacy collection?"
+    4. For delivery: Ask for full address with postcode
+    5. For collection: Use findNearbyPharmacies to show options
+    6. Use requestPharmacyDelivery to confirm arrangement
 
     BOOKING CONFIRMATION:
     - Verify all patient details before confirming
@@ -98,7 +115,7 @@ resource "aws_bedrockagent_agent_action_group" "scheduling_actions" {
   agent_id          = aws_bedrockagent_agent.scheduling.agent_id
   agent_version     = "DRAFT"
   action_group_name = "SchedulingActions"
-  description       = "Actions for scheduling appointments"
+  description       = "Actions for scheduling appointments, prescriptions, and pharmacy services"
 
   action_group_executor {
     lambda = aws_lambda_function.actions.arn
@@ -199,6 +216,105 @@ resource "aws_bedrockagent_agent_action_group" "scheduling_actions" {
               }
             }
             responses = { "200" = { description = "Nearby hospitals" } }
+          }
+        }
+        "/validate-referral" = {
+          post = {
+            operationId = "validateReferral"
+            description = "Check if patient has valid GP referral for specialist appointment. MUST check before booking specialist/hospital appointments."
+            requestBody = {
+              required = true
+              content = {
+                "application/json" = {
+                  schema = {
+                    type = "object"
+                    properties = {
+                      patient_name = { type = "string" }
+                      nhs_number   = { type = "string" }
+                      specialty    = { type = "string" }
+                    }
+                    required = ["patient_name"]
+                  }
+                }
+              }
+            }
+            responses = { "200" = { description = "Referral validation result" } }
+          }
+        }
+        "/request-prescription" = {
+          post = {
+            operationId = "requestPrescription"
+            description = "Request repeat prescription from GP surgery"
+            requestBody = {
+              required = true
+              content = {
+                "application/json" = {
+                  schema = {
+                    type = "object"
+                    properties = {
+                      patient_name        = { type = "string" }
+                      medications         = { type = "string", description = "Comma-separated medications" }
+                      delivery_preference = { type = "string", description = "deliver or collect" }
+                      pharmacy_name       = { type = "string" }
+                      patient_address     = { type = "string" }
+                    }
+                    required = ["patient_name", "medications"]
+                  }
+                }
+              }
+            }
+            responses = { "200" = { description = "Prescription requested" } }
+          }
+        }
+        "/find-nearby-pharmacies" = {
+          post = {
+            operationId = "findNearbyPharmacies"
+            description = "Find nearby pharmacies for prescription collection. If web search fails, ask patient for their preferred pharmacy name and address."
+            requestBody = {
+              required = true
+              content = {
+                "application/json" = {
+                  schema = {
+                    type = "object"
+                    properties = {
+                      patient_name       = { type = "string", description = "Patient full name" }
+                      patient_address    = { type = "string", description = "Patient address" }
+                      patient_postcode   = { type = "string", description = "Patient postcode (alternative to full address)" }
+                      preferred_pharmacy = { type = "string", description = "Patient's preferred pharmacy name (if search fails or patient has preference)" }
+                      pharmacy_address   = { type = "string", description = "Address of preferred pharmacy (if patient provides it)" }
+                      max_results        = { type = "integer", description = "Maximum pharmacies to return (default 5)" }
+                    }
+                    required = ["patient_name"]
+                  }
+                }
+              }
+            }
+            responses = { "200" = { description = "Nearby pharmacies" } }
+          }
+        }
+        "/request-pharmacy-delivery" = {
+          post = {
+            operationId = "requestPharmacyDelivery"
+            description = "Arrange prescription home delivery or pharmacy collection"
+            requestBody = {
+              required = true
+              content = {
+                "application/json" = {
+                  schema = {
+                    type = "object"
+                    properties = {
+                      patient_name       = { type = "string" }
+                      delivery_type      = { type = "string", description = "deliver or collect" }
+                      patient_address    = { type = "string" }
+                      patient_postcode   = { type = "string" }
+                      preferred_pharmacy = { type = "string" }
+                    }
+                    required = ["patient_name", "delivery_type"]
+                  }
+                }
+              }
+            }
+            responses = { "200" = { description = "Delivery arranged" } }
           }
         }
       }

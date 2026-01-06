@@ -10,19 +10,37 @@ resource "aws_bedrockagent_agent" "supervisor" {
   prepare_agent               = true
 
   instruction = <<-EOT
-    You are an NHS Patient Booking Assistant. Help patients book GP and specialist appointments.
+    You are an NHS Patient Booking Assistant. Help patients book GP and specialist appointments, request prescriptions, and find nearby pharmacies.
 
     IMPORTANT RULES:
-    1. You do NOT provide medical advice - only help with bookings
+    1. You do NOT provide medical advice - only help with bookings and prescriptions
     2. Be polite, professional, and reassuring
     3. Keep patients updated on what you're doing
 
     BOOKING WORKFLOW:
     1. Understand the patient's booking need (GP or specialist)
-    2. Check availability using the checkAvailability action
-    3. Create the booking using createBooking action
-    4. Approve it using approveBooking action
-    5. Send confirmation using sendConfirmation action
+    2. For SPECIALIST/HOSPITAL appointments: Check if patient has GP referral using validateReferral
+       - If no referral, explain they need to see GP first (unless self-referral service)
+    3. Check availability using the checkAvailability action
+    4. Create the booking using createBooking action
+    5. Approve it using approveBooking action
+    6. Send confirmation using sendConfirmation action
+
+    GP REFERRAL REQUIREMENTS:
+    - Most specialist and hospital appointments require a GP referral
+    - Always check for valid referral before booking specialist appointments
+    - Self-referral services (no GP needed): A&E, sexual health, NHS talking therapies, drug/alcohol services
+    - If no referral exists, guide patient to book GP appointment first
+
+    PRESCRIPTION REQUESTS:
+    When a patient wants to request a repeat prescription:
+    1. Ask for their full name
+    2. Ask which medications they need (name and dosage if known)
+    3. Use requestPrescription action
+    4. Ask if they want home delivery or pharmacy collection
+    5. If delivery: ask for full address including postcode
+    6. If collection: use findNearbyPharmacies to help them choose, or ask for preferred pharmacy
+    7. Use requestPharmacyDelivery to arrange delivery/collection
 
     FINDING NEARBY HOSPITALS:
     When a patient asks about nearby hospitals, clinics, or NHS facilities:
@@ -30,6 +48,12 @@ resource "aws_bedrockagent_agent" "supervisor" {
     2. Ask for their full address including postcode (e.g., "10 Downing Street, London SW1A 2AA")
     3. Use the findNearbyHospitals action with their name and address
     4. Present the results showing hospital name, distance, and services available
+
+    FINDING NEARBY PHARMACIES:
+    When a patient needs to find a pharmacy:
+    1. Ask for their address or postcode
+    2. Use findNearbyPharmacies action
+    3. Show pharmacies with distance, opening hours, and delivery options
 
     WEB SEARCH:
     You have access to real-time web search. Use it to:
@@ -202,6 +226,129 @@ resource "aws_bedrockagent_agent_action_group" "booking" {
               }
             }
             responses = { "200" = { description = "List of nearby hospitals with distance and contact info" } }
+          }
+        }
+        "/validate-referral" = {
+          post = {
+            operationId = "validateReferral"
+            description = "Check if patient has a valid GP referral for specialist/hospital appointment. MUST be called before booking specialist appointments."
+            requestBody = {
+              required = true
+              content = {
+                "application/json" = {
+                  schema = {
+                    type = "object"
+                    properties = {
+                      patient_name = { type = "string", description = "Patient full name" }
+                      nhs_number   = { type = "string", description = "Patient NHS number (optional)" }
+                      specialty    = { type = "string", description = "Specialty being referred to (e.g., cardiology, dermatology)" }
+                    }
+                    required = ["patient_name"]
+                  }
+                }
+              }
+            }
+            responses = { "200" = { description = "Referral validation result" } }
+          }
+        }
+        "/request-prescription" = {
+          post = {
+            operationId = "requestPrescription"
+            description = "Request a repeat prescription from GP surgery. Ask patient for medications needed."
+            requestBody = {
+              required = true
+              content = {
+                "application/json" = {
+                  schema = {
+                    type = "object"
+                    properties = {
+                      patient_name        = { type = "string", description = "Patient full name" }
+                      nhs_number          = { type = "string", description = "Patient NHS number (optional)" }
+                      medications         = { type = "string", description = "Comma-separated list of medications (e.g., 'Metformin 500mg, Lisinopril 10mg')" }
+                      gp_surgery          = { type = "string", description = "GP surgery name (optional)" }
+                      delivery_preference = { type = "string", description = "'deliver' for home delivery or 'collect' for pharmacy collection" }
+                      pharmacy_name       = { type = "string", description = "Preferred pharmacy for collection (optional)" }
+                      patient_address     = { type = "string", description = "Full address for home delivery (required if delivery_preference is 'deliver')" }
+                    }
+                    required = ["patient_name", "medications"]
+                  }
+                }
+              }
+            }
+            responses = { "200" = { description = "Prescription request submitted" } }
+          }
+        }
+        "/check-prescription-status" = {
+          post = {
+            operationId = "checkPrescriptionStatus"
+            description = "Check the status of a prescription request"
+            requestBody = {
+              required = true
+              content = {
+                "application/json" = {
+                  schema = {
+                    type = "object"
+                    properties = {
+                      prescription_id = { type = "string", description = "Prescription reference number" }
+                      patient_name    = { type = "string", description = "Patient name (alternative to prescription_id)" }
+                    }
+                  }
+                }
+              }
+            }
+            responses = { "200" = { description = "Prescription status" } }
+          }
+        }
+        "/find-nearby-pharmacies" = {
+          post = {
+            operationId = "findNearbyPharmacies"
+            description = "Find nearby pharmacies for prescription collection. If web search fails, ask patient for their preferred pharmacy name and address."
+            requestBody = {
+              required = true
+              content = {
+                "application/json" = {
+                  schema = {
+                    type = "object"
+                    properties = {
+                      patient_name       = { type = "string", description = "Patient full name" }
+                      patient_address    = { type = "string", description = "Patient address" }
+                      patient_postcode   = { type = "string", description = "Patient postcode (alternative to full address)" }
+                      preferred_pharmacy = { type = "string", description = "Patient's preferred pharmacy name (if search fails or patient has preference)" }
+                      pharmacy_address   = { type = "string", description = "Address of preferred pharmacy (if patient provides it)" }
+                      max_results        = { type = "integer", description = "Maximum pharmacies to return (default 5)" }
+                    }
+                    required = ["patient_name"]
+                  }
+                }
+              }
+            }
+            responses = { "200" = { description = "List of nearby pharmacies" } }
+          }
+        }
+        "/request-pharmacy-delivery" = {
+          post = {
+            operationId = "requestPharmacyDelivery"
+            description = "Arrange prescription delivery to home or collection from pharmacy"
+            requestBody = {
+              required = true
+              content = {
+                "application/json" = {
+                  schema = {
+                    type = "object"
+                    properties = {
+                      prescription_id    = { type = "string", description = "Prescription reference (optional)" }
+                      patient_name       = { type = "string", description = "Patient full name" }
+                      delivery_type      = { type = "string", description = "'deliver' for home delivery or 'collect' for pharmacy pickup" }
+                      patient_address    = { type = "string", description = "Full delivery address (required for home delivery)" }
+                      patient_postcode   = { type = "string", description = "Postcode (alternative to full address)" }
+                      preferred_pharmacy = { type = "string", description = "Preferred pharmacy name for collection" }
+                    }
+                    required = ["patient_name", "delivery_type"]
+                  }
+                }
+              }
+            }
+            responses = { "200" = { description = "Delivery/collection arrangement confirmed" } }
           }
         }
       }

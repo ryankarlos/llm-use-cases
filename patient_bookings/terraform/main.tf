@@ -50,6 +50,35 @@ resource "aws_dynamodb_table" "bookings" {
   }
 }
 
+# DynamoDB for prescriptions
+resource "aws_dynamodb_table" "prescriptions" {
+  name         = "${var.project_name}-prescriptions"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "prescription_id"
+
+  attribute {
+    name = "prescription_id"
+    type = "S"
+  }
+}
+
+# DynamoDB for GP referrals
+resource "aws_dynamodb_table" "referrals" {
+  name         = "${var.project_name}-referrals"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "referral_id"
+
+  attribute {
+    name = "referral_id"
+    type = "S"
+  }
+
+  ttl {
+    attribute_name = "expires_at"
+    enabled        = true
+  }
+}
+
 # Lambda for agent actions with X-Ray tracing
 resource "aws_lambda_function" "actions" {
   function_name = "${var.project_name}-actions"
@@ -69,8 +98,10 @@ resource "aws_lambda_function" "actions" {
 
   environment {
     variables = {
-      BOOKINGS_TABLE = aws_dynamodb_table.bookings.name
-      SESSIONS_TABLE = aws_dynamodb_table.sessions.name
+      BOOKINGS_TABLE      = aws_dynamodb_table.bookings.name
+      SESSIONS_TABLE      = aws_dynamodb_table.sessions.name
+      PRESCRIPTIONS_TABLE = aws_dynamodb_table.prescriptions.name
+      REFERRALS_TABLE     = aws_dynamodb_table.referrals.name
     }
   }
 }
@@ -126,7 +157,9 @@ resource "aws_iam_role_policy" "lambda_dynamodb" {
       ]
       Resource = [
         aws_dynamodb_table.sessions.arn,
-        aws_dynamodb_table.bookings.arn
+        aws_dynamodb_table.bookings.arn,
+        aws_dynamodb_table.prescriptions.arn,
+        aws_dynamodb_table.referrals.arn
       ]
     }]
   })

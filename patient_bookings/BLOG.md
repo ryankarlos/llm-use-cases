@@ -108,7 +108,7 @@ resource "aws_bedrockagent_data_source" "nhs" {
 
 ## Configuring the Bedrock Agent with Guardrails
 
-The Bedrock Agent serves as the orchestration layer that interprets patient requests and coordinates between the knowledge base and action groups. The agent uses Amazon Nova Lite as its foundation model, which provides strong natural language understanding with fast response times and cost-effective pricing. Nova Lite handles the nuanced language patients use when describing their health concerns and booking preferences.
+The Bedrock Agent serves as the orchestration layer that interprets patient requests and coordinates between the knowledge base and action groups. The supervisor agent uses Amazon Nova Premier with web grounding for real-time search capabilities, while collaborator agents use Amazon Nova Lite for fast response times and cost-effective pricing. Nova Premier enables the supervisor to search for current NHS information, while Nova Lite handles the nuanced language patients use when describing their health concerns and booking preferences.
 
 For healthcare applications, safety boundaries are critical. Amazon Bedrock Guardrails provide a configurable layer that filters both inputs and outputs. The guardrails for this assistant are configured to block requests for medical advice, detect and redirect emergency situations, and ensure responses stay focused on booking assistance. When a patient asks "What medication should I take for my headache?", the guardrails intercept this request and the agent responds with guidance to consult a healthcare professional rather than attempting to provide medical advice.
 
@@ -170,9 +170,200 @@ resource "aws_bedrockagent_agent_knowledge_base_association" "nhs" {
 
 ## Implementing Action Groups with Lambda
 
-Action groups define the operations the agent can perform. This solution implements four distinct actions, each handling a specific part of the booking workflow. The Check Availability action queries the scheduling system for open slots. The Create Booking action reserves a slot for the patient. The Approve Booking action confirms the reservation after validation. The Send Confirmation action dispatches notifications via email or SMS.
+Action groups define the operations the agent can perform. This solution implements multiple action categories covering the complete patient journey: booking appointments, managing GP referrals, requesting prescriptions, and arranging pharmacy delivery.
+
+### Booking Actions
+
+The core booking actions handle appointment scheduling. The Check Availability action queries the scheduling system for open slots. The Create Booking action reserves a slot for the patient. The Approve Booking action confirms the reservation after validation. The Send Confirmation action dispatches notifications via email or SMS.
 
 Each action is specified using an OpenAPI schema that describes the endpoint, parameters, and expected behavior. The agent uses this schema to understand when and how to invoke each action. When a patient says "I need an appointment next Tuesday morning", the agent recognizes this as an availability query and invokes the Check Availability action with the appropriate parameters.
+
+### GP Referral Validation
+
+Hospital and specialist appointments in the NHS typically require a GP referral. The agent validates referrals before allowing specialist bookings, ensuring patients follow the correct pathway. When a patient requests a specialist appointment, the agent first checks for a valid referral using the Validate Referral action.
+
+```python
+def validate_referral(params):
+    """Validate if patient has a GP referral for specialist/hospital booking."""
+    
+    patient_name = params.get("patient_name", "")
+    specialty = params.get("specialty", "")
+    
+    # Check for existing referral in DynamoDB
+    # In production, would query NHS Spine or local referral system
+    
+    if referral and referral.get("status") == "active":
+        return {
+            "valid": True,
+            "referral_id": referral.get("referral_id"),
+            "specialty": referral.get("specialty"),
+            "message": "Valid GP referral found. You can proceed with specialist booking."
+        }
+    
+    # No referral found - provide guidance
+    return {
+        "valid": False,
+        "reason": "No valid GP referral found for this specialty",
+        "guidance": [
+            "Most specialist and hospital appointments require a GP referral",
+            "Please book a GP appointment first to discuss your condition",
+            "Your GP can then refer you to the appropriate specialist"
+        ],
+        "self_referral_services": [
+            "Accident & Emergency (A&E)",
+            "Sexual health clinics",
+            "NHS talking therapies (IAPT)"
+        ]
+    }
+```
+
+The agent instruction explicitly requires referral validation for specialist bookings while allowing self-referral for specific services like A&E and sexual health clinics.
+
+### Prescription Requests and Pharmacy Delivery
+
+Patients can request repeat prescriptions through the assistant. The prescription workflow collects medication details, submits the request to the GP surgery, and arranges either home delivery or pharmacy collection based on patient preference.
+
+```python
+def request_prescription(params):
+    """Request a repeat prescription from GP surgery."""
+    
+    patient_name = params.get("patient_name", "")
+    medications = params.get("medications", "")  # Comma-separated list
+    delivery_preference = params.get("delivery_preference", "collect")
+    patient_address = params.get("patient_address", "")
+    
+    prescription_id = f"RX-{datetime.now().strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}"
+    med_list = [m.strip() for m in medications.split(",")]
+    
+    prescription = {
+        "prescription_id": prescription_id,
+        "patient_name": patient_name,
+        "medications": med_list,
+        "delivery_preference": delivery_preference,
+        "status": "pending_approval",
+        "estimated_ready": (datetime.now() + timedelta(days=2)).strftime("%Y-%m-%d")
+    }
+    
+    # Save to DynamoDB
+    table = dynamodb.Table(PRESCRIPTIONS_TABLE)
+    table.put_item(Item=prescription)
+    
+    return {
+        "success": True,
+        "prescription_id": prescription_id,
+        "medications": med_list,
+        "status": "pending_approval",
+        "message": f"Prescription request submitted. Your GP will review within 48 hours."
+    }
+```
+
+The Find Nearby Pharmacies action uses Amazon Location Service to locate pharmacies near the patient's address, showing distance, opening hours, and delivery options. Patients can then choose their preferred pharmacy for collection or request home delivery.
+
+```python
+def find_nearby_pharmacies(params):
+    """Find nearby pharmacies for prescription collection."""
+    
+    search_location = params.get("patient_address") or params.get("patient_postcode")
+    
+    # Use Amazon Location Service to geocode and search
+    geocode_response = location.geocode(
+        QueryText=search_location,
+        Filter={"IncludeCountries": ["GBR"]}
+    )
+    
+    position = geocode_response["ResultItems"][0]["Position"]
+    
+    search_response = location.search_nearby(
+        QueryPosition=position,
+        Filter={"IncludeCategories": ["pharmacy", "drugstore"]}
+    )
+    
+    pharmacies = [{
+        "name": item.get("Title"),
+        "address": item.get("Address", {}).get("Label"),
+        "distance_km": round(item.get("Distance") / 1000, 1),
+        "delivery_available": True
+    } for item in search_response.get("ResultItems", [])]
+    
+    return {"success": True, "nearby_pharmacies": pharmacies}
+```
+
+### Finding Nearby Hospitals and Pharmacies
+
+The assistant helps patients locate nearby NHS facilities using Amazon Location Service for geocoding and place search. When a patient needs to find a hospital or pharmacy, the agent collects their address and uses the Location Service API to find facilities within their area.
+
+The hospital search function first geocodes the patient's address to get coordinates, then searches for nearby healthcare facilities. Results include the facility name, full address with postcode, distance, phone number, NHS Trust, and available services.
+
+```python
+def find_nearby_hospitals(params):
+    """Find nearby hospitals using Amazon Location Service."""
+    
+    patient_address = params.get("patient_address", "")
+    
+    # Geocode patient address
+    geocode_response = location.geocode(
+        QueryText=patient_address,
+        Filter={"IncludeCountries": ["GBR"]}
+    )
+    
+    position = geocode_response["ResultItems"][0]["Position"]
+    
+    # Search for nearby hospitals
+    search_response = location.search_nearby(
+        QueryPosition=position,
+        Filter={"IncludeCategories": ["hospital", "medical-center"]}
+    )
+    
+    hospitals = [{
+        "name": item.get("Title"),
+        "address": item.get("Address", {}).get("Label"),
+        "distance_km": round(item.get("Distance") / 1000, 1),
+        "phone": item.get("Contacts", {}).get("Phones", [{}])[0].get("Value", ""),
+        "services": ["A&E", "Maternity", "Outpatient"]
+    } for item in search_response.get("ResultItems", [])]
+    
+    return {"success": True, "nearby_hospitals": hospitals}
+```
+
+When the Location Service is unavailable or returns no results, the functions fall back to sensible defaults. For hospitals, St Thomas' Hospital in London serves as the default NHS facility. For pharmacies, LloydsPharmacy is used as the default with their actual customer service number.
+
+```python
+def _get_nhs_hospitals_for_area(patient_name, patient_address):
+    """Return default NHS hospital when Location Service fails."""
+    
+    default_hospital = {
+        "name": "St Thomas' Hospital",
+        "address": "Westminster Bridge Road, Lambeth, London SE1 7EH",
+        "postcode": "SE1 7EH",
+        "phone": "020 7188 7188",
+        "nhs_trust": "Guy's and St Thomas' NHS Foundation Trust",
+        "services": ["A&E", "Maternity", "Cancer Care", "Cardiology"]
+    }
+    
+    return {
+        "success": True,
+        "nearby_hospitals": [default_hospital],
+        "message": "Could not find specific hospitals. Showing default NHS hospital.",
+        "note": "For emergencies, call 999. Use NHS 111 to find your nearest hospital."
+    }
+```
+
+The pharmacy search also supports user-provided preferences. If a patient already knows their preferred pharmacy, they can provide the name and address directly, bypassing the location search entirely. This is useful when patients have an established relationship with a specific pharmacy for their prescriptions.
+
+```python
+# If user provided specific pharmacy details, use those
+if preferred_pharmacy and pharmacy_address:
+    return {
+        "success": True,
+        "nearby_pharmacies": [{
+            "name": preferred_pharmacy,
+            "address": pharmacy_address,
+            "services": ["NHS Prescriptions", "Repeat Prescriptions"],
+            "user_provided": True
+        }],
+        "message": f"Using your preferred pharmacy: {preferred_pharmacy}"
+    }
+```
 
 The Lambda function handles all booking operations through a single handler that routes requests based on the API path. This pattern keeps the infrastructure simple while supporting multiple distinct actions. Each action function contains the business logic for its specific operation.
 
@@ -458,8 +649,13 @@ python scripts/test_multi_agent.py --message "I need an urgent appointment today
 
 A typical booking conversation demonstrates the intelligent availability handling. When you request a specific slot that is unavailable, the assistant proactively offers alternatives rather than simply rejecting the request.
 
+**GP Referral Check for Specialist Appointments:**
 ```
-Patient: I'd like to book an appointment with Dr. Williams for Monday morning.
+Patient: I need to see a cardiologist about my heart palpitations.
+
+[ROUTING TO] SchedulingSpecialist
+[ACTION] SchedulingActions/validate-referral
+[LAMBDA] {"valid": false, "reason": "No valid GP referral found"}
 
 [ROUTING TO] SchedulingSpecialist
 [ACTION] SchedulingActions/check-availability
@@ -499,56 +695,13 @@ Please arrive 10 minutes early and bring your NHS number and any relevant
 medical records. I've sent a confirmation to your email and phone.
 ```
 
-The trace output shows the multi-agent routing in action. The supervisor identifies this as a scheduling request and routes to the SchedulingSpecialist collaborator. That agent then invokes the Lambda actions to check availability, create the booking, and approve it. The conversation history flows between agents so the scheduling agent has full context of the patient's preferences.
-
-
-
-## Multi-Agent Collaboration Architecture
-
-The solution implements Amazon Bedrock's multi-agent collaboration feature, where a supervisor agent orchestrates specialist collaborator agents. This architecture provides several advantages over a single monolithic agent. Each specialist agent has focused instructions and capabilities, making them more reliable at their specific tasks. The supervisor handles routing logic and conversation flow, while collaborators execute domain-specific operations.
-
-The multi-agent setup consists of four agents working together. The Supervisor Agent acts as the patient's primary point of contact, greeting them, understanding their needs, and routing requests to the appropriate specialist. The Triage Agent assesses urgency based on symptom descriptions, categorizing requests as emergency, urgent, or routine. For emergency situations, it immediately advises calling 999 rather than proceeding with booking. The Scheduling Agent handles all booking operations through Lambda action groups, checking availability, creating bookings, and managing confirmations. The Information Agent answers questions about NHS services by searching the knowledge base, providing guidance on appointment types, what to bring, and patient flow procedures.
-
-
-```hcl
-resource "aws_bedrockagent_agent" "supervisor_multi" {
-  agent_name                  = "${var.project_name}-supervisor"
-  agent_resource_role_arn     = aws_iam_role.bedrock_agent.arn
-  agent_collaboration         = "SUPERVISOR"
-  foundation_model            = "amazon.nova-lite-v1:0"
-  idle_session_ttl_in_seconds = 600
-
-  instruction = <<-EOT
-    You are the NHS Patient Booking Supervisor. You coordinate a team of specialist agents.
-
-    YOUR TEAM:
-    1. TRIAGE AGENT - Assesses urgency of patient requests
-    2. SCHEDULING AGENT - Handles availability and bookings  
-    3. INFORMATION AGENT - Answers questions about NHS services
-
-    WORKFLOW:
-    1. Greet the patient warmly
-    2. If patient describes symptoms or health concerns, route to TRIAGE AGENT
-    3. For booking requests, route to SCHEDULING AGENT
-    4. For questions about NHS services, route to INFORMATION AGENT
-    5. Summarize outcomes and confirm next steps with patient
-  EOT
-}
-
-
-resource "aws_bedrockagent_agent_collaborator" "scheduling" {
-  agent_id                   = aws_bedrockagent_agent.supervisor_multi.agent_id
-  collaborator_name          = "SchedulingSpecialist"
-  collaboration_instruction  = "Route booking requests to this agent. It will check availability, offer alternatives, and create bookings."
-  relay_conversation_history = "TO_COLLABORATOR"
-
-  agent_descriptor {
-    alias_arn = aws_bedrockagent_agent_alias.scheduling_live.agent_alias_arn
-  }
-}
+**Prescription Request with Pharmacy Delivery:**
 ```
+Patient: I need to request my repeat prescription for Metformin and Lisinopril.
 
-The `relay_conversation_history` setting determines how much context flows to collaborators. Setting it to `TO_COLLABORATOR` passes the full conversation history, allowing the scheduling agent to understand previous exchanges about patient preferences and urgency assessments. This context sharing is essential for coherent multi-turn conversations where information gathered by one agent informs the actions of another.
+[ROUTING TO] SchedulingSpecialist
+[ACTION] SchedulingActions/request-prescription
+[LAMBDA] {"prescription_id": "RX-20260106-X7Y8Z9", "status": "pending_approval"} Setting it to `TO_COLLABORATOR` passes the full conversation history, allowing the scheduling agent to understand previous exchanges about patient preferences and urgency assessments. This context sharing is essential for coherent multi-turn conversations where information gathered by one agent informs the actions of another.
 
 
 
@@ -622,3 +775,13 @@ To get started with this solution, clone the repository and follow the deploymen
 - [Amazon Nova Models](https://aws.amazon.com/ai/generative-ai/nova/)
 - [Prompt Caching](https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html)
 - [Intelligent Prompt Routing](https://docs.aws.amazon.com/bedrock/latest/userguide/intelligent-prompt-routing.html)
+
+Assistant: I've submitted your prescription request for Metformin and Lisinopril. 
+Your GP will review it within 48 hours. Reference: RX-20260106-X7Y8Z9
+
+Would you like home delivery or pharmacy collection?
+
+Patient: I'd like to collect it from a pharmacy near my home in SE1.
+
+[ACTION] SchedulingActions/find-nearby-pharmacies
+[LAMBDA] {"nearby_pharmacies": [{"name": "Boots", "address": "Waterloo Station, SE1 8SW", "distance_km": 0.3}]}
