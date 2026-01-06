@@ -9,6 +9,8 @@ vendor
 .terragrunt-cache
 .bundle
 .ruby-version
+terraform.tfstate
+terraform.tfstate.backup
 .terraform.lock.hcl
 .DS_Store
 mocks/
@@ -20,7 +22,6 @@ mocks/
 # lambda_function.zip
 import.tf
 venv
-.venv
 *.pem
 __pycache__
 *.pyc
