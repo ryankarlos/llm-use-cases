@@ -19,19 +19,6 @@ variable "tag" {
   }
 }
 
-variable "litellm_secret_name" {
-  description = "LiteLLM secret name in Secrets Manager"
-  type        = string
-  default     = "litellm-secrets"
-}
-
-variable "litellm_secret_values" {
-  description = "LiteLLM secret values (JSON string with LITELLM_MASTER_KEY and LITELLM_SALT_KEY)"
-  type        = string
-  sensitive   = true
-  default     = "{\"LITELLM_MASTER_KEY\":\"placeholder\",\"LITELLM_SALT_KEY\":\"placeholder\"}"
-}
-
 variable "litellm_log_level" {
   description = "LiteLLM log level"
   type        = string
@@ -42,30 +29,6 @@ variable "env" {
   description = "Environment name (e.g., dev, staging, prod)"
   type        = string
   default     = "dev"
-}
-
-variable "hosted_zone_name" {
-  description = "Route53 hosted zone name"
-  type        = string
-  default     = "litellmdemo.com"
-}
-
-variable "subdomain" {
-  description = "Subdomain for the LiteLLM service"
-  type        = string
-  default     = "api"
-}
-
-variable "alb_name" {
-  description = "Name for the Application Load Balancer"
-  type        = string
-  default     = "litellm"
-}
-
-variable "target_group_name" {
-  description = "Name for the target group"
-  type        = string
-  default     = "litellm-target-group"
 }
 
 variable "litellm_port" {
@@ -283,8 +246,32 @@ variable "phoenix_api_key" {
   sensitive   = true
 }
 
+variable "phoenix_project_name" {
+  description = "Arize Phoenix project name"
+  type        = string
+  default     = "litellm-demo"
+}
+
 variable "vpc_name" {
   description = "Name tag of the VPC to use"
   type        = string
   default     = "main-vpc"
+}
+
+variable "allowed_cidr_blocks" {
+  description = "CIDR blocks allowed to access ALB (your IP address)"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+variable "waf_whitelisted_ips" {
+  description = "IP addresses to whitelist in WAF (CIDR format, e.g., 203.0.113.50/32)"
+  type        = list(string)
+  default     = []
+}
+
+variable "waf_rate_limit" {
+  description = "Maximum requests per 5-minute period per IP before blocking (DDoS protection)"
+  type        = number
+  default     = 2000
 }

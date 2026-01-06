@@ -178,7 +178,7 @@ resource "aws_iam_role_policy" "lambda_secrets_policy" {
         Action = [
           "secretsmanager:GetSecretValue"
         ]
-        Resource = aws_secretsmanager_secret.litellm_secrets.arn
+        Resource = aws_secretsmanager_secret.litellm_master_salt.arn
       }
     ]
   })
@@ -196,13 +196,13 @@ resource "aws_lambda_function" "lex_fulfillment" {
   memory_size      = 256
 
   vpc_config {
-    subnet_ids         = local.private_subnet_ids
+    subnet_ids         = local.public_subnet_ids
     security_group_ids = [data.aws_security_group.workload_security_group.id]
   }
 
   environment {
     variables = {
-      LITELLM_ENDPOINT = "http://${module.load_balancer_litellm.dns}:${var.litellm_port}"
+      LITELLM_ENDPOINT = "https://${aws_lb.litellm.dns_name}"
       LITELLM_API_KEY  = "" # Will be populated from Secrets Manager in production
       MODEL_NAME       = "claude-3-sonnet"
     }
