@@ -29,3 +29,19 @@ output "neptune_port" {
   description = "Neptune cluster port"
   value       = aws_neptune_cluster.graphrag.port
 }
+
+# API outputs
+output "api_endpoint" {
+  description = "Lambda Function URL for CV Matcher API"
+  value       = aws_lambda_function_url.cv_matcher.function_url
+}
+
+output "lambda_function_name" {
+  description = "Lambda function name"
+  value       = aws_lambda_function.cv_matcher.function_name
+}
+
+output "ecr_repository_url" {
+  description = "ECR repository URL for Lambda container"
+  value       = aws_ecr_repository.cv_matcher.repository_url
+}

@@ -1,166 +1,173 @@
-# CV Hybrid RAG - GraphRAG Toolkit Integration
+# CV Hybrid RAG - GraphRAG Toolkit for Candidate Matching
 
-CV matching system using AWS GraphRAG Toolkit's [lexical-graph](https://github.com/awslabs/graphrag-toolkit/tree/main/lexical-graph) for intelligent candidate-to-job matching.
-
-## Overview
-
-This project demonstrates how to use graph-enhanced RAG for CV matching:
-
-1. **Local Skill-Based Matching**: Fast, rule-based matching using skill overlap and experience
-2. **Graph-Enhanced Matching**: Uses lexical graph to find structurally relevant candidates beyond semantic similarity
-
-The lexical graph model provides three tiers:
-- **Source tier**: Documents and chunks
-- **Entity-relationship tier**: Extracted skills, experiences, and their relationships  
-- **Summarization tier**: Topics, statements, and facts
+An intelligent CV-to-job matching system using AWS GraphRAG Toolkit's [lexical-graph](https://github.com/awslabs/graphrag-toolkit/tree/main/lexical-graph) for graph-enhanced retrieval augmented generation.
 
 ## Architecture
 
 ```
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│   CVs / Jobs    │────▶│  LexicalGraph    │────▶│ Neptune Database│
-│   (Documents)   │     │  Index           │     │ (Graph Store)   │
-└─────────────────┘     └──────────────────┘     └─────────────────┘
-                                │
-                                ▼
-                        ┌──────────────────┐
-                        │ OpenSearch       │
-                        │ (Vector Store)   │
-                        └──────────────────┘
-                                │
-                                ▼
-┌─────────────────┐     ┌──────────────────┐
-│   Query         │────▶│ LexicalGraph     │────▶ Matched Candidates
-│   (Job Req)     │     │ QueryEngine      │     with explanations
-└─────────────────┘     └──────────────────┘
+┌─────────────────┐     ┌──────────────────────────────────────────────────┐
+│   Gradio UI     │────▶│         Lambda Function URL                      │
+│   (app.py)      │     │  (FastAPI + Mangum - no API Gateway needed)      │
+└─────────────────┘     └──────────────────────┬───────────────────────────┘
+                                               │
+                       ┌───────────────────────────────────────────────────┐
+                       │                Lambda Function                     │
+                       │  ┌─────────────────────────────────────────────┐  │
+                       │  │  GraphRAG Service (lexical-graph)           │  │
+                       │  │  • Skill-based matching (fallback)          │  │
+                       │  │  • Graph-enhanced retrieval (when indexed)  │  │
+                       │  └─────────────────────────────────────────────┘  │
+                       └───────────────────────┬───────────────────────────┘
+                                               │
+          ┌────────────────────────────────────┼────────────────────────────┐
+          │                                    │                            │
+          ▼                                    ▼                            ▼
+┌─────────────────┐              ┌─────────────────────┐        ┌──────────────────┐
+│ Amazon Neptune  │              │ OpenSearch          │        │ Amazon Bedrock   │
+│ Serverless v2   │              │ Serverless          │        │ • Nova Lite      │
+│ (Graph Store)   │              │ (Vector Store)      │        │ • Titan Embed v2 │
+└─────────────────┘              └─────────────────────┘        └──────────────────┘
 ```
 
 ## Quick Start
 
-### Demo Mode (No AWS Required)
+### Prerequisites
+
+- Python 3.12+, [uv](https://docs.astral.sh/uv/), AWS CLI, Terraform 1.0+
+
+### Deploy Infrastructure
 
 ```bash
-cd CV_hybrid_RAG
-pip install -r requirements.txt
-python -m src.demo --mode demo
-```
-
-### Live Mode (With AWS Infrastructure)
-
-1. Deploy infrastructure:
-```bash
-cd terraform
+cd CV_hybrid_RAG/terraform
 terraform init
 terraform apply
 ```
 
-2. Install GraphRAG toolkit:
-```bash
-pip install "graphrag-toolkit-lexical-graph @ git+https://github.com/awslabs/graphrag-toolkit.git#subdirectory=lexical-graph"
+**Outputs:**
+```
+api_endpoint = "https://xxx.lambda-url.us-east-1.on.aws/"
+neptune_endpoint = "cv-matcher-neptune-dev.cluster-xxx.us-east-1.neptune.amazonaws.com"
+opensearch_endpoint = "https://xxx.us-east-1.aoss.amazonaws.com"
 ```
 
-3. Set environment variables:
+### Index Candidates (Local Script)
+
+Run locally to populate Neptune graph and OpenSearch vectors:
+
 ```bash
-export NEPTUNE_ENDPOINT="your-neptune-endpoint"
-export OPENSEARCH_ENDPOINT="your-opensearch-endpoint"
-export AWS_REGION="us-east-1"
+cd CV_hybrid_RAG
+uv venv .venv
+uv pip install -r requirements.txt --python .venv/Scripts/python.exe
+
+# Set endpoints and run indexing
+export NEPTUNE_ENDPOINT="cv-matcher-neptune-dev.cluster-xxx.us-east-1.neptune.amazonaws.com"
+export OPENSEARCH_ENDPOINT="https://xxx.us-east-1.aoss.amazonaws.com"
+.venv/Scripts/python.exe scripts/index_candidates.py
 ```
 
-4. Run with live infrastructure:
+### Run Gradio UI
+
 ```bash
-python -m src.demo --mode live
+# Run with Lambda Function URL
+.venv/Scripts/python.exe -m CV_hybrid_RAG.src.app --api-url https://xxx.lambda-url.us-east-1.on.aws/
 ```
+
+Open http://localhost:7860
+
+### Run Tests
+
+```bash
+.venv/Scripts/python.exe -m pytest tests/ -v
+```
+
+## API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/health` | GET | Health check with GraphRAG status |
+| `/jobs` | GET | List available job roles |
+| `/candidates` | GET | List all candidates |
+| `/match` | POST | Match candidates to job role |
+| `/compare` | POST | Compare two candidates |
+
+### Example: Match Candidates
+
+```bash
+curl -X POST https://xxx.lambda-url.us-east-1.on.aws/match \
+  -H "Content-Type: application/json" \
+  -d '{"role_id": "data_scientist"}'
+```
+
+**Response:**
+```json
+{
+  "job": {"role_id": "data_scientist", "title": "Data Scientist", ...},
+  "matches": [
+    {"candidate_name": "Sarah Chen", "match_score": 100.0, ...},
+    {"candidate_name": "Priya Patel", "match_score": 60.0, ...}
+  ],
+  "graphrag_enabled": true
+}
+```
+
+## Scoring Formula
+
+- **50%** - Direct skill matches
+- **30%** - Related skill matches (transferable skills)
+- **20%** - Experience relevance
 
 ## Project Structure
 
 ```
 CV_hybrid_RAG/
 ├── src/
-│   ├── __init__.py
-│   ├── cv_matcher.py        # Local skill-based matching
-│   ├── graph_rag_service.py # GraphRAG toolkit integration
-│   ├── job_roles.py         # Job role definitions
-│   ├── models.py            # Data models
-│   └── demo.py              # Demo script
-├── data/
-│   └── sample_cvs.json      # Sample candidate data
+│   └── app.py               # Gradio UI (API-only mode)
+├── lambda/
+│   ├── handler.py           # FastAPI + Mangum Lambda handler
+│   ├── Dockerfile           # Container with GraphRAG toolkit
+│   └── requirements.txt
+├── scripts/
+│   └── index_candidates.py  # Local script to populate graph/vectors
 ├── terraform/
-│   ├── knowledge_base.tf    # OpenSearch + Bedrock KB
-│   ├── neptune.tf           # Neptune for graph store
-│   ├── variables.tf
+│   ├── lambda_api.tf        # Lambda + Function URL
+│   ├── neptune.tf           # Neptune Serverless v2
+│   ├── oss.tf               # OpenSearch Serverless
 │   └── output.tf
 ├── tests/
+│   └── test_lambda_handler.py
 └── requirements.txt
 ```
 
-## Usage Examples
+## GraphRAG Integration
 
-### Index CVs and Jobs
-
-```python
-from src import GraphRAGService, GraphRAGConfig, CVDocument, JobDocument
-
-# Initialize service
-config = GraphRAGConfig.from_env()
-service = GraphRAGService(config)
-service.initialize()
-
-# Index a CV
-cv = CVDocument(
-    candidate_id="cand_001",
-    candidate_name="Sarah Chen",
-    content="Senior Data Scientist with 5 years experience...",
-    skills=["Python", "Machine Learning", "TensorFlow"],
-    experience_years=5
-)
-service.index_cv(cv)
-
-# Index a job
-job = JobDocument(
-    job_id="ds_001",
-    title="Data Scientist",
-    content="Looking for experienced data scientist...",
-    required_skills=["Python", "Machine Learning", "SQL"],
-    min_experience_years=3
-)
-service.index_job(job)
-```
-
-### Find Matching Candidates
+The Lambda handler includes GraphRAG service integration using AWS GraphRAG Toolkit:
 
 ```python
-# Find candidates for a job using graph-enhanced retrieval
-results = service.find_candidates_for_job(job, top_k=5)
+from graphrag_toolkit.lexical_graph import LexicalGraphQueryEngine
+from graphrag_toolkit.lexical_graph.storage import GraphStoreFactory, VectorStoreFactory
 
-for result in results:
-    print(f"{result.candidate_name}: {result.match_score:.1f}%")
-    print(f"  Matched entities: {result.matched_entities}")
+# Connect to Neptune and OpenSearch
+graph_store = GraphStoreFactory.for_graph_store(f"neptune-db://{NEPTUNE_ENDPOINT}")
+vector_store = VectorStoreFactory.for_vector_store(f"aoss://{OPENSEARCH_ENDPOINT}")
+
+# Query with graph-enhanced retrieval
+query_engine = LexicalGraphQueryEngine.for_traversal_based_search(graph_store, vector_store)
 ```
 
-### Hybrid Matching
+## Cost Considerations
 
-```python
-from src import CVMatcherService, CandidateProfile
+| Service | Pricing |
+|---------|---------|
+| Neptune Serverless | ~$0.10/NCU-hour |
+| OpenSearch Serverless | ~$0.24/OCU-hour |
+| Lambda | Pay per invocation |
+| Lambda Function URL | Free (included with Lambda) |
 
-# Local skill-based matching
-matcher = CVMatcherService()
-candidates = [...]  # List of CandidateProfile
-
-local_matches = matcher.rank_candidates(candidates, job_role)
-
-# Combine with graph results for hybrid scoring
-```
-
-## AWS Services Used
-
-- **Amazon Neptune**: Graph database for lexical graph storage
-- **Amazon OpenSearch Serverless**: Vector store for embeddings
-- **Amazon Bedrock**: LLM for entity extraction and response generation
-  - Claude 3 Sonnet: Entity extraction
-  - Titan Embeddings v2: Vector embeddings
+**Tip:** Run `terraform destroy` when not using infrastructure.
 
 ## References
 
 - [AWS GraphRAG Toolkit](https://github.com/awslabs/graphrag-toolkit)
 - [Introducing the GraphRAG Toolkit](https://aws.amazon.com/blogs/database/introducing-the-graphrag-toolkit/)
-- [lexical-graph Documentation](https://github.com/awslabs/graphrag-toolkit/tree/main/lexical-graph)
+- [Amazon Neptune](https://aws.amazon.com/neptune/)
+- [Amazon Bedrock](https://aws.amazon.com/bedrock/)
