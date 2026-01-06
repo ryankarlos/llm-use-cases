@@ -345,3 +345,18 @@ variable "eks_oidc_provider_url" {
   type        = string
   default     = ""
 }
+
+
+variable "cloudfront_subdomain" {
+  description = "Subdomain for CloudFront distribution"
+  type        = string
+  default     = "api"
+}
+
+
+variable "phoenix_api_key" {
+  description = "Arize Phoenix cloud API key for LLM observability"
+  type        = string
+  default     = ""
+  sensitive   = true
+}

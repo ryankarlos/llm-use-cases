@@ -99,7 +99,7 @@ data "aws_iam_policy_document" "this" {
 
 
 module "kms_s3" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git?ref=v4.0.0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git"
 
   description             = "S3 kms CMK"
   key_usage               = "ENCRYPT_DECRYPT"

@@ -67,7 +67,7 @@ resource "aws_ssm_parameter" "litellm_redis_host" {
 
 ## no pii so ss3-s3 encryption is ok.
 module "s3_lb_logs" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=v5.1.0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git"
 
   bucket              = var.s3_buckets.lb_access_logs
   allowed_kms_key_arn = module.kms_s3.key_arn
@@ -85,7 +85,7 @@ module "s3_lb_logs" {
 
 
 module "s3_litellm_config" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=v5.1.0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git"
 
   bucket = var.s3_buckets.litellm
 
@@ -131,27 +131,25 @@ resource "aws_db_subnet_group" "aurora_subnet_group" {
 
 
 module "aurora_db" {
-  source            = "git::https://github.com/terraform-aws-modules/terraform-aws-rds-aurora.git?ref=v9.16.1"
+  source            = "git::https://github.com/terraform-aws-modules/terraform-aws-rds-aurora.git"
   name              = "litellm-aurora-postgresql"
   engine            = "aurora-postgresql"
   engine_mode       = "provisioned"
-  instance_class    = "db_serverless"
   instances         = local.serverless_instances
   storage_encrypted = true
   master_username   = "postgres"
 
   vpc_id               = data.aws_vpc.main.id
   db_subnet_group_name = aws_db_subnet_group.aurora_subnet_group.name
-  security_group_rules = {
+  security_group_ingress_rules = {
     vpc_ingress = {
-      cidr_blocks = [var.ingress_cidr_range]
-
+      cidr_ipv4 = var.ingress_cidr_range
     }
   }
 
   manage_master_user_password        = false
-  master_password                    = random_password.aurora_password_main.result
-  monitoring_interval                = 60
+  master_password_wo                 = random_password.aurora_password_main.result
+  cluster_monitoring_interval        = 60
   preferred_maintenance_window       = var.maintenance_window
   skip_final_snapshot                = var.skip_final_snapshot
   serverlessv2_scaling_configuration = var.aurora_scaling_config
@@ -163,7 +161,7 @@ module "aurora_db" {
 }
 
 module "elasticache" {
-  source         = "git::https://github.com/terraform-aws-modules/terraform-aws-elasticache.git?ref=v1.10.3"
+  source         = "git::https://github.com/terraform-aws-modules/terraform-aws-elasticache.git"
   engine         = "valkey"
   engine_version = var.engine_version
   node_type      = var.node_type
@@ -348,8 +346,25 @@ module "ecs_litellm" {
           value = "${random_password.redis_password_main.result}"
         },
         {
-          name = "REDIS_SSL",
-        value = "True" }
+          name  = "REDIS_SSL",
+          value = "True"
+        },
+        {
+          name  = "PHOENIX_API_KEY",
+          value = var.phoenix_api_key
+        },
+        {
+          name  = "PHOENIX_PROJECT_NAME",
+          value = "litellm-demo"
+        },
+        {
+          name  = "BEDROCK_GUARDRAIL_ID",
+          value = aws_bedrock_guardrail.content_filter.guardrail_id
+        },
+        {
+          name  = "BEDROCK_GUARDRAIL_VERSION",
+          value = aws_bedrock_guardrail_version.content_filter.version
+        }
 
       ],
       # this block fetches values from secret manager

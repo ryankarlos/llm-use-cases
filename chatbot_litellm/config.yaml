@@ -1,0 +1,51 @@
+model_list:
+  - model_name: claude-3-sonnet
+    litellm_params:
+      model: bedrock/anthropic.claude-3-sonnet-20240229-v1:0
+      aws_region_name: us-east-1
+  - model_name: claude-3-haiku
+    litellm_params:
+      model: bedrock/anthropic.claude-3-haiku-20240307-v1:0
+      aws_region_name: us-east-1
+  - model_name: titan-text
+    litellm_params:
+      model: bedrock/amazon.titan-text-express-v1
+      aws_region_name: us-east-1
+  - model_name: eu.amazon.nova-pro-v1:0
+    owned_by: bedrock
+    litellm_params:
+      model: bedrock/eu.amazon.nova-pro-v1:0
+  - model_name: eu.anthropic.claude-sonnet-4-20250514-v1:0
+    owned_by: bedrock
+    litellm_params:
+      model: bedrock/eu.anthropic.claude-sonnet-4-20250514-v1:0
+
+router_settings:
+  routing_strategy: "cost-based-routing"
+  num_retries: 3
+  timeout: 60
+
+litellm_settings:
+  set_verbose: true
+  request_timeout: 60
+  callbacks: ["arize_phoenix", "prometheus"]
+  guardrails:
+    - guardrail_name: "bedrock-content-filter"
+      litellm_params:
+        guardrail: bedrock/litellm-content-filter
+        mode: "during_call"
+        guardrailConfig:
+          guardrailIdentifier: "${BEDROCK_GUARDRAIL_ID}"
+          guardrailVersion: "${BEDROCK_GUARDRAIL_VERSION}"
+          trace: "enabled"
+
+# Phoenix cloud configuration - set PHOENIX_API_KEY environment variable
+# to connect to your Arize Phoenix cloud account
+environment_variables:
+  PHOENIX_PROJECT_NAME: "litellm-demo"
+
+general_settings:
+  proxy_batch_write_at: 60
+  database_connection_pool_limit: 10
+  disable_error_logs: True
+  allow_requests_on_db_unavailable: True
