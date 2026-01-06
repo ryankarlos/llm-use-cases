@@ -92,8 +92,10 @@ patient_bookings/
 ├── knowledge_base/
 │   └── nhs_content/          # NHS documentation for KB
 ├── tests/
-│   ├── test_lambda_actions.py
-│   └── test_bedrock_client.py
+│   ├── test_lambda_actions.py    # Unit tests with mocking
+│   ├── test_lambda_with_moto.py  # DynamoDB tests using moto
+│   ├── test_bedrock_with_moto.py # Bedrock agent management tests
+│   └── test_agent_e2e.py         # End-to-end agent invocation tests
 └── requirements.txt
 ```
 
@@ -135,6 +137,59 @@ Agent: [Routes to Information Agent]
        [Searches Knowledge Base]
        Please bring your NHS number, a list of current medications, 
        and any relevant test results or referral letters.
+```
+
+## Testing
+
+The project includes 56 tests covering unit tests, AWS service mocking with moto, and end-to-end agent invocation.
+
+### Run All Tests
+
+```bash
+cd patient_bookings
+.\.venv\Scripts\python.exe -m pytest tests/ -v
+```
+
+### Test Files
+
+| File | Description | AWS Services |
+|------|-------------|--------------|
+| `test_lambda_actions.py` | Unit tests with manual mocking | DynamoDB (mocked) |
+| `test_lambda_with_moto.py` | Integration tests using moto | DynamoDB |
+| `test_bedrock_with_moto.py` | Bedrock agent management tests | bedrock-agent, IAM |
+| `test_agent_e2e.py` | End-to-end agent invocation | bedrock-agent-runtime (live) |
+
+### Using Moto for AWS Mocking
+
+The tests use [moto](https://github.com/getmoto/moto) to mock AWS services locally without requiring real AWS resources:
+
+```python
+from moto import mock_aws
+
+@pytest.fixture
+def dynamodb_tables(aws_credentials):
+    with mock_aws():
+        dynamodb = boto3.resource("dynamodb", region_name="us-east-1")
+        dynamodb.create_table(
+            TableName="nhs-booking-demo-bookings",
+            KeySchema=[{"AttributeName": "booking_id", "KeyType": "HASH"}],
+            AttributeDefinitions=[{"AttributeName": "booking_id", "AttributeType": "S"}],
+            BillingMode="PAY_PER_REQUEST"
+        )
+        yield dynamodb
+```
+
+Moto supports `bedrock-agent` for agent/KB management (create, get, list, delete, tagging) but does NOT support `bedrock-agent-runtime` (invoke_agent). E2E tests require deployed infrastructure.
+
+### E2E Tests
+
+E2E tests require environment variables and deployed agents:
+
+```bash
+set AWS_REGION=us-east-1
+set SUPERVISOR_AGENT_ID=R5CKKTHOFB
+set SUPERVISOR_ALIAS_ID=CWU2HM8ITH
+pytest tests/test_agent_e2e.py -v
 ```
 
 ## Cleanup
