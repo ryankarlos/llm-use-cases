@@ -1,144 +1,51 @@
-
-variable "vector_dimension" {
-  description = "The dimension of the vectors produced by the model."
-  type        = number
-  default     = 1024
-}
-
-
-variable "chunking_strategy" {
+# Environment
+variable "env" {
   type        = string
-  description = "Chunking strategy to use (DEFAULT, FIXED_SIZE, HIERARCHICAL, SEMANTIC)"
-  default     = "FIXED_SIZE"
-  validation {
-    condition     = contains(["DEFAULT", "FIXED_SIZE", "HIERARCHICAL", "SEMANTIC", "NONE"], var.chunking_strategy)
-    error_message = "Chunking strategy must be one of: DEFAULT, FIXED_SIZE, HIERARCHICAL, SEMANTIC, NONE"
-  }
+  description = "Environment name (dev, staging, prod)"
+  default     = "dev"
 }
 
-# Fixed Size Chunking Variables
-variable "fixed_size_max_tokens" {
-  type        = number
-  description = "Maximum number of tokens for fixed-size chunking"
-  default     = 512
-}
-
-variable "fixed_size_overlap_percentage" {
-  type        = number
-  description = "Percentage of overlap between chunks"
-  default     = 20
-}
-
-# Hierarchical Chunking Variables
-variable "hierarchical_overlap_tokens" {
-  type        = number
-  description = "Number of tokens to overlap in hierarchical chunking"
-  default     = 70
-}
-
-variable "hierarchical_parent_max_tokens" {
-  type        = number
-  description = "Maximum tokens for parent chunks"
-  default     = 1000
-}
-
-variable "hierarchical_child_max_tokens" {
-  type        = number
-  description = "Maximum tokens for child chunks"
-  default     = 500
-}
-
-# Semantic Chunking Variables
-variable "semantic_max_tokens" {
-  type        = number
-  description = "Maximum tokens for semantic chunking"
-  default     = 512
-}
-
-variable "semantic_buffer_size" {
-  type        = number
-  description = "Buffer size for semantic chunking"
-  default     = 1
-}
-
-variable "semantic_breakpoint_percentile_threshold" {
-  type        = number
-  description = "Breakpoint percentile threshold for semantic chunking"
-  default     = 75
-}
-
-variable "bedrock_embedding_model_arn" {
+variable "aws_region" {
   type        = string
-  description = "Embedding model for Knowledge base"
+  description = "AWS region"
+  default     = "us-east-1"
 }
 
+# OpenSearch Serverless
+variable "allow_public_access" {
+  type        = bool
+  description = "Allow public access to OpenSearch collection"
+  default     = true
+}
+
+variable "vpc_endpoint_ids" {
+  type        = list(string)
+  description = "VPC endpoint IDs for private access (if allow_public_access is false)"
+  default     = []
+}
+
+variable "allowed_principals" {
+  type        = list(string)
+  description = "IAM principals allowed to access the collection"
+}
+
+# Neptune
+variable "vpc_id" {
+  type        = string
+  description = "VPC ID for Neptune cluster"
+}
+
+variable "vpc_cidr" {
+  type        = string
+  description = "VPC CIDR block"
+}
+
+variable "private_subnet_ids" {
+  type        = list(string)
+  description = "List of private subnet IDs for Neptune"
+}
 
 variable "allowed_users" {
-  description = "users allowed to access storage"
   type        = list(string)
-}
-
-variable "cert_body" {
-  type        = string
-  description = "Entra cert body"
-}
-
-variable "cert_pk" {
-  type        = string
-  description = "Entra cert pk"
-}
-
-variable "kb_data_path" {
-  type = string
-}
-
-variable "number_of_shards" {
-  type    = string
-  default = "2"
-}
-
-variable "number_of_replicas" {
-  type    = string
-  default = "0"
-}
-
-variable "index_knn" {
-  type    = bool
-  default = true
-}
-
-variable "index_knn_algo_param_ef_search" {
-  type    = string
-  default = "512"
-}
-
-
-variable "vector_index_name" {
-  type        = string
-  description = "Name for the vector index"
-  default     = "bedrock-knowledge-base-default-index"
-}
-
-
-variable "oss_default_vector_config" {
-  type = object({
-    type      = string
-    dimension = number
-    method = object({
-      name   = string
-      engine = string
-      parameters = object({
-        m               = number
-        ef_construction = number
-      })
-      space_type = string
-    })
-  })
-}
-
-
-variable "kb_id_manual" {
-  type        = string
-  description = "knowledge base id for kb created manually from console"
-  default     = ""
+  description = "IAM users allowed to administer KMS keys"
 }
