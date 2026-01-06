@@ -31,3 +31,5 @@ lambda.zip
 *.tfvars
 !*.tfvars.example
 llmperf
+.venv
+venv
