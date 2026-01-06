@@ -3,44 +3,34 @@ model_list:
     litellm_params:
       model: bedrock/amazon.titan-text-express-v1
       aws_region_name: us-east-1
-  - model_name: eu.amazon.nova-pro-v1:0
-    owned_by: bedrock
+  - model_name: nova-pro
     litellm_params:
-      model: bedrock/eu.amazon.nova-pro-v1:0
+      model: bedrock/us.amazon.nova-pro-v1:0
+      aws_region_name: us-east-1
+
+litellm_settings:
+  callbacks: ["arize_phoenix"]
+
+guardrails:
+  - guardrail_name: "bedrock-content-filter"
+    litellm_params:
+      guardrail: bedrock
+      mode: "during_call"
+      guardrailIdentifier: os.environ/GUARDRAIL_ID
+      guardrailVersion: os.environ/GUARDRAIL_VERSION
 
 router_settings:
   routing_strategy: "cost-based-routing"
   num_retries: 3
   timeout: 60
 
-
-litellm_settings:
-  callbacks: ["arize_phoenix"]
-
-
-guardrails:
-  - guardrail_name: "bedrock-pre-guard"
-    litellm_params:
-      guardrail: bedrock
-      mode: "pre_call"  # Important: must use pre_call mode for masking
-      guardrailIdentifier:  os.environ/GUARDRAIL_ID
-      guardrailVersion:  os.environ/GUARDRAIL_VERSION
-      aws_region_name: os.environ/AWS_REGION
-      aws_role_name: os.environ/AWS_ROLE_ARN
-      mask_request_content: true    # Enable masking in user requests
-      mask_response_content: true   # Enable masking in model responses
-
-# Phoenix cloud configuration - set PHOENIX_API_KEY environment variable
-# to connect to your Arize Phoenix cloud account
-environment_variables:
-  PHOENIX_PROJECT_NAME: os.environ/PHOENIX_PROJECT_NAME
-  PHOENIX_API_KEY: os.environ/PHOENIX_AP_KEY
-
-
 general_settings:
   proxy_batch_write_at: 60
   database_connection_pool_limit: 10
-  disable_error_logs: True
   allow_requests_on_db_unavailable: True
 
+environment_variables:
+  PHOENIX_API_KEY: os.environ/PHOENIX_AP_KEY
+  PHOENIX_COLLECTOR_ENDPOINT: os.environ/PHOENIX_COLLECTOR_ENDPOINT
+  PHOENIX_PROJECT_NAME: os.environ/PHOENIX_PROJECT_NAME
 

@@ -17,16 +17,21 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
-# Get public subnets for all resources (ALB, ECS, Aurora, ElastiCache)
+# Get public subnets with Internet Gateway for ECS/ALB
 data "aws_subnets" "public_subnets" {
   filter {
     name   = "vpc-id"
     values = [data.aws_vpc.main.id]
   }
   filter {
-    name   = "tag:Name"
-    values = ["*public*"]
+    name   = "subnet-id"
+    values = ["subnet-0e165015f85692b36", "subnet-04fd3ba1aa9d56cb0"]
   }
+}
+
+# Keep existing subnets for Aurora/ElastiCache (can't be changed while in use)
+locals {
+  database_subnet_ids = ["subnet-0b84a76c5e30c472a", "subnet-0d52c6f2a1e754f4e"]
 }
 
 data "aws_iam_session_context" "current" {

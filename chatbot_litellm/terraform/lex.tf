@@ -74,6 +74,44 @@ resource "aws_lexv2models_bot_locale" "en_us" {
   }
 }
 
+# Greeting Intent - welcomes user
+resource "aws_lexv2models_intent" "greeting_intent" {
+  bot_id      = aws_lexv2models_bot.qa_assistant.id
+  bot_version = aws_lexv2models_bot_locale.en_us.bot_version
+  locale_id   = aws_lexv2models_bot_locale.en_us.locale_id
+  name        = "GreetingIntent"
+  description = "Intent that greets the user and offers help"
+
+  sample_utterance {
+    utterance = "hi"
+  }
+  sample_utterance {
+    utterance = "hello"
+  }
+  sample_utterance {
+    utterance = "hey"
+  }
+  sample_utterance {
+    utterance = "good morning"
+  }
+  sample_utterance {
+    utterance = "good afternoon"
+  }
+  sample_utterance {
+    utterance = "good evening"
+  }
+  sample_utterance {
+    utterance = "howdy"
+  }
+  sample_utterance {
+    utterance = "hi there"
+  }
+
+  fulfillment_code_hook {
+    enabled = true
+  }
+}
+
 # QA Intent - forwards queries to LLM
 resource "aws_lexv2models_intent" "qa_intent" {
   bot_id      = aws_lexv2models_bot.qa_assistant.id
@@ -94,6 +132,59 @@ resource "aws_lexv2models_intent" "qa_intent" {
   sample_utterance {
     utterance = "what is this"
   }
+  sample_utterance {
+    utterance = "can you explain"
+  }
+  sample_utterance {
+    utterance = "what do you know about"
+  }
+  sample_utterance {
+    utterance = "how does this work"
+  }
+  sample_utterance {
+    utterance = "why is"
+  }
+
+  fulfillment_code_hook {
+    enabled = true
+  }
+}
+
+# Closing Intent - ends conversation
+resource "aws_lexv2models_intent" "closing_intent" {
+  bot_id      = aws_lexv2models_bot.qa_assistant.id
+  bot_version = aws_lexv2models_bot_locale.en_us.bot_version
+  locale_id   = aws_lexv2models_bot_locale.en_us.locale_id
+  name        = "ClosingIntent"
+  description = "Intent that ends the conversation"
+
+  sample_utterance {
+    utterance = "bye"
+  }
+  sample_utterance {
+    utterance = "goodbye"
+  }
+  sample_utterance {
+    utterance = "see you"
+  }
+  sample_utterance {
+    utterance = "thanks bye"
+  }
+  sample_utterance {
+    utterance = "that's all"
+  }
+  sample_utterance {
+    utterance = "I'm done"
+  }
+  sample_utterance {
+    utterance = "no more questions"
+  }
+  sample_utterance {
+    utterance = "thank you"
+  }
+  sample_utterance {
+    utterance = "thanks"
+  }
 
   fulfillment_code_hook {
     enabled = true
@@ -111,7 +202,9 @@ resource "aws_lexv2models_bot_version" "qa_assistant_v1" {
   }
 
   depends_on = [
-    aws_lexv2models_intent.qa_intent
+    aws_lexv2models_intent.greeting_intent,
+    aws_lexv2models_intent.qa_intent,
+    aws_lexv2models_intent.closing_intent
   ]
 }
 
@@ -178,7 +271,10 @@ resource "aws_iam_role_policy" "lambda_secrets_policy" {
         Action = [
           "secretsmanager:GetSecretValue"
         ]
-        Resource = aws_secretsmanager_secret.litellm_master_salt.arn
+        Resource = [
+          aws_secretsmanager_secret.litellm_master_salt.arn,
+          aws_secretsmanager_secret.litellm_api_key.arn
+        ]
       }
     ]
   })
@@ -202,9 +298,9 @@ resource "aws_lambda_function" "lex_fulfillment" {
 
   environment {
     variables = {
-      LITELLM_ENDPOINT = "https://${aws_lb.litellm.dns_name}"
-      LITELLM_API_KEY  = "" # Will be populated from Secrets Manager in production
-      MODEL_NAME       = "claude-3-sonnet"
+      LITELLM_ENDPOINT       = "https://${aws_lb.litellm.dns_name}"
+      LITELLM_API_KEY_SECRET = aws_secretsmanager_secret.litellm_api_key.arn
+      MODEL_NAME             = "nova-pro"
     }
   }
 

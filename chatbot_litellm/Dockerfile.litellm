@@ -1,10 +1,17 @@
-FROM ghcr.io/berriai/litellm:main-latest
+# Use the provided base image
+FROM docker.litellm.ai/berriai/litellm:main-stable
 
-# Copy config file into the container
-COPY config.yaml /app/config.yaml
+# Set the working directory to /app
+WORKDIR /app
 
-# Expose the port
+# Copy the configuration file into the container at /app
+COPY config.yaml .
+
+# Make sure your docker/entrypoint.sh is executable
+RUN chmod +x ./docker/entrypoint.sh
+
+# Expose the necessary port
 EXPOSE 4000/tcp
 
-# Start LiteLLM with the config file
-CMD ["--config", "/app/config.yaml", "--port", "4000"]
+
+CMD ["--port", "4000", "--config", "config.yaml", "--detailed_debug"]

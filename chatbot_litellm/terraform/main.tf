@@ -1,5 +1,7 @@
 locals {
   public_subnet_ids = data.aws_subnets.public_subnets.ids
+  config_hash       = filemd5("${path.module}/../config.yaml")
+  dockerfile_hash   = filemd5("${path.module}/../Dockerfile.litellm")
 
   serverless_instances = {
     1 = {
@@ -9,6 +11,42 @@ locals {
       performance_insights_kms_key_id = var.performance_insights_kms_key_id
     }
   }
+}
+
+# =============================================================================
+# Docker Build and Push to ECR
+# =============================================================================
+resource "aws_ecr_repository" "litellm" {
+  name                 = "litellm-base"
+  image_tag_mutability = "MUTABLE"
+  force_delete         = true
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = {
+    Project     = var.project_name
+    Environment = var.env
+  }
+}
+
+resource "null_resource" "docker_build_push" {
+  triggers = {
+    config_hash     = local.config_hash
+    dockerfile_hash = local.dockerfile_hash
+  }
+
+  provisioner "local-exec" {
+    working_dir = "${path.module}/.."
+    command     = <<-EOT
+      aws ecr get-login-password --region ${data.aws_region.current.name} | docker login --username AWS --password-stdin ${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com
+      docker build -f Dockerfile.litellm -t ${aws_ecr_repository.litellm.repository_url}:latest .
+      docker push ${aws_ecr_repository.litellm.repository_url}:latest
+    EOT
+  }
+
+  depends_on = [aws_ecr_repository.litellm]
 }
 
 # =============================================================================
@@ -131,13 +169,31 @@ resource "aws_secretsmanager_secret_version" "phoenix_api_key" {
   secret_string = var.phoenix_api_key
 }
 
+# =============================================================================
+# Secrets Manager - LiteLLM API Key (for Lambda/external access)
+# =============================================================================
+resource "aws_secretsmanager_secret" "litellm_api_key" {
+  name_prefix             = "${var.project_name}-litellm-api-key-"
+  recovery_window_in_days = 0
+
+  tags = {
+    Project     = var.project_name
+    Environment = var.env
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "litellm_api_key" {
+  secret_id     = aws_secretsmanager_secret.litellm_api_key.id
+  secret_string = var.litellm_api_key
+}
+
 
 # =============================================================================
 # Aurora PostgreSQL
 # =============================================================================
 resource "aws_db_subnet_group" "aurora" {
   name       = "${var.project_name}-aurora-subnet-group"
-  subnet_ids = local.public_subnet_ids
+  subnet_ids = local.database_subnet_ids
 
   tags = {
     Project     = var.project_name
@@ -207,7 +263,7 @@ module "elasticache" {
 
   subnet_group_name        = "${var.project_name}-valkey-subnet"
   subnet_group_description = "Valkey subnet group for ${var.env}"
-  subnet_ids               = local.public_subnet_ids
+  subnet_ids               = local.database_subnet_ids
 
   create_parameter_group      = var.create_parameter_group
   parameter_group_family      = var.parameter_group_family
@@ -557,17 +613,6 @@ resource "aws_lb_listener" "http_redirect" {
 
 
 # =============================================================================
-# Bedrock VPC Endpoints
-# =============================================================================
-module "bedrock" {
-  source                         = "github.com/ryankarlos/terraform_modules.git//aws/bedrock"
-  vpc_id                         = data.aws_vpc.main.id
-  vpc_endpoint_security_group_id = aws_security_group.ecs.id
-  endpoint_subnet_ids            = local.public_subnet_ids
-  security_group_id              = aws_security_group.ecs.id
-}
-
-# =============================================================================
 # ECS Cluster and Service
 # =============================================================================
 resource "aws_cloudwatch_log_group" "litellm" {
@@ -697,7 +742,7 @@ resource "aws_ecs_task_definition" "litellm" {
   container_definitions = jsonencode([
     {
       name      = "litellm"
-      image     = var.image_uri_litellm
+      image     = "${aws_ecr_repository.litellm.repository_url}:latest"
       essential = true
 
       environment = [
@@ -710,7 +755,8 @@ resource "aws_ecs_task_definition" "litellm" {
         { name = "GUARDRAIL_ID", value = aws_bedrock_guardrail.content_filter.guardrail_id },
         { name = "GUARDRAIL_VERSION", value = aws_bedrock_guardrail_version.content_filter.version },
         { name = "AWS_ROLE_ARN", value = aws_iam_role.ecs_task.arn },
-        { name = "PHOENIX_PROJECT_NAME", value = var.phoenix_project_name }
+        { name = "PHOENIX_PROJECT_NAME", value = var.phoenix_project_name },
+        { name = "PHOENIX_COLLECTOR_ENDPOINT", value = var.phoenix_collector_endpoint }
       ]
 
       secrets = [
@@ -766,6 +812,9 @@ resource "aws_ecs_service" "litellm" {
   desired_count   = var.desired_count
   launch_type     = var.launch_type
 
+  # Force new deployment when image is rebuilt
+  force_new_deployment = true
+
   network_configuration {
     subnets          = local.public_subnet_ids
     security_groups  = [aws_security_group.ecs.id]
@@ -782,6 +831,9 @@ resource "aws_ecs_service" "litellm" {
     enable   = true
     rollback = true
   }
+
+  # Ensure new image is pushed before service update
+  depends_on = [null_resource.docker_build_push]
 
   tags = {
     Project     = var.project_name

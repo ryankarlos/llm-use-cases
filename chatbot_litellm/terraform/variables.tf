@@ -252,6 +252,12 @@ variable "phoenix_project_name" {
   default     = "litellm-demo"
 }
 
+variable "phoenix_collector_endpoint" {
+  description = "Arize Phoenix collector endpoint URL"
+  type        = string
+  default     = "https://app.phoenix.arize.com/v1/traces"
+}
+
 variable "vpc_name" {
   description = "Name tag of the VPC to use"
   type        = string
@@ -274,4 +280,11 @@ variable "waf_rate_limit" {
   description = "Maximum requests per 5-minute period per IP before blocking (DDoS protection)"
   type        = number
   default     = 2000
+}
+
+variable "litellm_api_key" {
+  description = "LiteLLM API key for external access (Lambda, etc.)"
+  type        = string
+  default     = ""
+  sensitive   = true
 }
