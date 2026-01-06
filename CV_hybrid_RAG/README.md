@@ -11,11 +11,10 @@ An intelligent CV-to-job matching system using AWS GraphRAG Toolkit's [lexical-g
 └─────────────────┘     └──────────────────────┬───────────────────────────┘
                                                │
                        ┌───────────────────────────────────────────────────┐
-                       │                Lambda Function                     │
+                       │           Lambda Function (Container)              │
                        │  ┌─────────────────────────────────────────────┐  │
-                       │  │  GraphRAG Service (lexical-graph)           │  │
-                       │  │  • Skill-based matching (fallback)          │  │
-                       │  │  • Graph-enhanced retrieval (when indexed)  │  │
+                       │  │  FastAPI + Mangum                           │  │
+                       │  │  GraphRAG Service (lexical-graph v3.15.0)   │  │
                        │  └─────────────────────────────────────────────┘  │
                        └───────────────────────┬───────────────────────────┘
                                                │
@@ -33,7 +32,7 @@ An intelligent CV-to-job matching system using AWS GraphRAG Toolkit's [lexical-g
 
 ### Prerequisites
 
-- Python 3.12+, [uv](https://docs.astral.sh/uv/), AWS CLI, Terraform 1.0+
+- Python 3.12+, AWS CLI, Docker, Terraform 1.0+
 
 ### Deploy Infrastructure
 
@@ -50,35 +49,46 @@ neptune_endpoint = "cv-matcher-neptune-dev.cluster-xxx.us-east-1.neptune.amazona
 opensearch_endpoint = "https://xxx.us-east-1.aoss.amazonaws.com"
 ```
 
-### Index Candidates (Local Script)
-
-Run locally to populate Neptune graph and OpenSearch vectors:
+### Build and Deploy Lambda
 
 ```bash
-cd CV_hybrid_RAG
-uv venv .venv
-uv pip install -r requirements.txt --python .venv/Scripts/python.exe
+cd CV_hybrid_RAG/lambda
 
-# Set endpoints and run indexing
-export NEPTUNE_ENDPOINT="cv-matcher-neptune-dev.cluster-xxx.us-east-1.neptune.amazonaws.com"
-export OPENSEARCH_ENDPOINT="https://xxx.us-east-1.aoss.amazonaws.com"
-.venv/Scripts/python.exe scripts/index_candidates.py
+# Build container
+docker build -t cv-matcher-api:latest .
+
+# Push to ECR (after terraform creates the repo)
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <account>.dkr.ecr.us-east-1.amazonaws.com
+docker tag cv-matcher-api:latest <account>.dkr.ecr.us-east-1.amazonaws.com/cv-matcher-api-dev:latest
+docker push <account>.dkr.ecr.us-east-1.amazonaws.com/cv-matcher-api-dev:latest
+
+# Update Lambda
+aws lambda update-function-code --function-name cv-matcher-api-dev \
+  --image-uri <account>.dkr.ecr.us-east-1.amazonaws.com/cv-matcher-api-dev:latest
+```
+
+### Index Candidates (Optional - for GraphRAG)
+
+Run from a Linux/Mac environment or Docker (Windows has path issues with the toolkit):
+
+```bash
+# From Docker container with graphrag-toolkit installed
+docker run --rm -e NEPTUNE_ENDPOINT=xxx -e OPENSEARCH_ENDPOINT=xxx \
+  -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN \
+  cv-matcher-api:latest python scripts/index_candidates.py
 ```
 
 ### Run Gradio UI
 
 ```bash
+cd CV_hybrid_RAG
+pip install -r requirements.txt
+
 # Run with Lambda Function URL
-.venv/Scripts/python.exe -m CV_hybrid_RAG.src.app --api-url https://xxx.lambda-url.us-east-1.on.aws/
+python -m CV_hybrid_RAG.src.app --api-url https://xxx.lambda-url.us-east-1.on.aws/
 ```
 
 Open http://localhost:7860
-
-### Run Tests
-
-```bash
-.venv/Scripts/python.exe -m pytest tests/ -v
-```
 
 ## API Endpoints
 
@@ -103,8 +113,8 @@ curl -X POST https://xxx.lambda-url.us-east-1.on.aws/match \
 {
   "job": {"role_id": "data_scientist", "title": "Data Scientist", ...},
   "matches": [
-    {"candidate_name": "Sarah Chen", "match_score": 100.0, ...},
-    {"candidate_name": "Priya Patel", "match_score": 60.0, ...}
+    {"candidate_name": "Sarah Chen", "match_score": 100.0, "direct_matches": [...], "skill_gaps": []},
+    {"candidate_name": "Priya Patel", "match_score": 60.0, "skill_gaps": ["SQL"]}
   ],
   "graphrag_enabled": true
 }
@@ -121,7 +131,7 @@ curl -X POST https://xxx.lambda-url.us-east-1.on.aws/match \
 ```
 CV_hybrid_RAG/
 ├── src/
-│   └── app.py               # Gradio UI (API-only mode)
+│   └── app.py               # Gradio UI (API client)
 ├── lambda/
 │   ├── handler.py           # FastAPI + Mangum Lambda handler
 │   ├── Dockerfile           # Container with GraphRAG toolkit
@@ -138,36 +148,28 @@ CV_hybrid_RAG/
 └── requirements.txt
 ```
 
-## GraphRAG Integration
+## Key Features
 
-The Lambda handler includes GraphRAG service integration using AWS GraphRAG Toolkit:
-
-```python
-from graphrag_toolkit.lexical_graph import LexicalGraphQueryEngine
-from graphrag_toolkit.lexical_graph.storage import GraphStoreFactory, VectorStoreFactory
-
-# Connect to Neptune and OpenSearch
-graph_store = GraphStoreFactory.for_graph_store(f"neptune-db://{NEPTUNE_ENDPOINT}")
-vector_store = VectorStoreFactory.for_vector_store(f"aoss://{OPENSEARCH_ENDPOINT}")
-
-# Query with graph-enhanced retrieval
-query_engine = LexicalGraphQueryEngine.for_traversal_based_search(graph_store, vector_store)
-```
+- **No API Gateway** - Uses Lambda Function URLs (free, simpler)
+- **FastAPI + Mangum** - Clean routing, automatic OpenAPI docs at `/docs`
+- **Container Lambda** - Handles GraphRAG toolkit's large dependencies
+- **Skill-based matching** - Works immediately without graph indexing
+- **Graph-enhanced** - Optional GraphRAG for semantic skill relationships
 
 ## Cost Considerations
 
-| Service | Pricing |
-|---------|---------|
-| Neptune Serverless | ~$0.10/NCU-hour |
-| OpenSearch Serverless | ~$0.24/OCU-hour |
-| Lambda | Pay per invocation |
-| Lambda Function URL | Free (included with Lambda) |
+| Service | Pricing | Notes |
+|---------|---------|-------|
+| Neptune Serverless | ~$0.10/NCU-hour | Scales based on load |
+| OpenSearch Serverless | ~$0.24/OCU-hour | Minimum 2 OCUs |
+| Lambda | Pay per invocation | First 1M free/month |
+| Lambda Function URL | Free | Included with Lambda |
 
 **Tip:** Run `terraform destroy` when not using infrastructure.
 
 ## References
 
 - [AWS GraphRAG Toolkit](https://github.com/awslabs/graphrag-toolkit)
-- [Introducing the GraphRAG Toolkit](https://aws.amazon.com/blogs/database/introducing-the-graphrag-toolkit/)
+- [Lambda Function URLs](https://docs.aws.amazon.com/lambda/latest/dg/lambda-urls.html)
+- [Mangum - ASGI adapter for Lambda](https://mangum.io/)
 - [Amazon Neptune](https://aws.amazon.com/neptune/)
-- [Amazon Bedrock](https://aws.amazon.com/bedrock/)
