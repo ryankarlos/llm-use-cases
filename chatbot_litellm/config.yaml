@@ -7,9 +7,21 @@ model_list:
     litellm_params:
       model: bedrock/us.amazon.nova-pro-v1:0
       aws_region_name: us-east-1
+  - model_name: fake-openai-endpoint
+    litellm_params:
+      model: openai/fake
+      api_key: fake-key
+      api_base: https://exampleopenaiendpoint-production.up.railway.app/
+
 
 litellm_settings:
   callbacks: ["arize_phoenix"]
+  cache: True
+  cache_params:
+    type: redis
+    host: os.environ/REDIS_HOST
+    port: os.environ/REDIS_PORT
+    password: os.environ/REDIS_PASSWORD
 
 guardrails:
   - guardrail_name: "bedrock-content-filter"
@@ -23,6 +35,9 @@ router_settings:
   routing_strategy: "cost-based-routing"
   num_retries: 3
   timeout: 60
+  redis_host: os.environ/REDIS_HOST
+  redis_port: os.environ/REDIS_PORT
+  redis_password: os.environ/REDIS_PASSWORD
 
 general_settings:
   proxy_batch_write_at: 60

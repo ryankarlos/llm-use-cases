@@ -30,3 +30,4 @@ lambda.zip
 # Terraform secrets
 *.tfvars
 !*.tfvars.example
+llmperf
