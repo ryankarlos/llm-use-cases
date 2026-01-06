@@ -19,26 +19,26 @@ output "aurora_cluster_reader_endpoint" {
 
 output "cert_secret_arn" {
   description = "cert secret arn"
-  value       = module.litellm_secrets.secret_arn
+  value       = aws_secretsmanager_secret.litellm_secrets.arn
 }
 
 
 output "litellm_main_secret_arn" {
   description = "litellm main secret arn"
-  value       = module.litellm_secrets.secret_arn
+  value       = aws_secretsmanager_secret.litellm_secrets.arn
 }
 
 
 
 output "litellm_redis_secret_arn" {
   description = "litellm redis secret arn"
-  value       = module.litellm_redis_secret.secret_arn
+  value       = aws_secretsmanager_secret.litellm_redis_secret.arn
 }
 
 
 output "litellm_aurora_secret_arn" {
   description = "litellm aurora secret arn"
-  value       = module.litellm_aurora_secret.secret_arn
+  value       = aws_secretsmanager_secret.litellm_aurora_secret.arn
 }
 
 

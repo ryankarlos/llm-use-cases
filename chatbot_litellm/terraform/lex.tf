@@ -74,15 +74,26 @@ resource "aws_lexv2models_bot_locale" "en_us" {
   }
 }
 
-# Fallback Intent - forwards all queries to LLM
-resource "aws_lexv2models_intent" "fallback" {
+# QA Intent - forwards queries to LLM
+resource "aws_lexv2models_intent" "qa_intent" {
   bot_id      = aws_lexv2models_bot.qa_assistant.id
   bot_version = aws_lexv2models_bot_locale.en_us.bot_version
   locale_id   = aws_lexv2models_bot_locale.en_us.locale_id
-  name        = "FallbackIntent"
-  description = "Default intent that forwards all queries to LiteLLM"
+  name        = "QAIntent"
+  description = "Intent that forwards queries to LiteLLM"
 
-  parent_intent_signature = "AMAZON.FallbackIntent"
+  sample_utterance {
+    utterance = "help me with something"
+  }
+  sample_utterance {
+    utterance = "I have a question"
+  }
+  sample_utterance {
+    utterance = "tell me about something"
+  }
+  sample_utterance {
+    utterance = "what is this"
+  }
 
   fulfillment_code_hook {
     enabled = true
@@ -100,7 +111,7 @@ resource "aws_lexv2models_bot_version" "qa_assistant_v1" {
   }
 
   depends_on = [
-    aws_lexv2models_intent.fallback
+    aws_lexv2models_intent.qa_intent
   ]
 }
 
@@ -167,32 +178,25 @@ resource "aws_iam_role_policy" "lambda_secrets_policy" {
         Action = [
           "secretsmanager:GetSecretValue"
         ]
-        Resource = module.litellm_secrets.secret_arn
+        Resource = aws_secretsmanager_secret.litellm_secrets.arn
       }
     ]
   })
 }
 
-# Archive the Lambda function code
-data "archive_file" "lex_fulfillment" {
-  type        = "zip"
-  source_file = "${path.module}/../lambda/lex_fulfillment.py"
-  output_path = "${path.module}/lex_fulfillment.zip"
-}
-
 # Lambda Function
 resource "aws_lambda_function" "lex_fulfillment" {
-  filename         = data.archive_file.lex_fulfillment.output_path
+  filename         = "${path.module}/../lambda/lex_fulfillment.zip"
   function_name    = "lex-qa-fulfillment"
   role             = aws_iam_role.lex_lambda_role.arn
   handler          = "lex_fulfillment.lambda_handler"
-  source_code_hash = data.archive_file.lex_fulfillment.output_base64sha256
+  source_code_hash = filebase64sha256("${path.module}/../lambda/lex_fulfillment.zip")
   runtime          = "python3.11"
   timeout          = 30
   memory_size      = 256
 
   vpc_config {
-    subnet_ids         = local.az_subnet_ids.workload
+    subnet_ids         = local.private_subnet_ids
     security_group_ids = [data.aws_security_group.workload_security_group.id]
   }
 

@@ -2,13 +2,17 @@ resource "random_id" "suffix" {
   byte_length = 4
 }
 
+locals {
+  replication_group_name = coalesce(var.replication_group_id, "litellm-valkey")
+}
+
 resource "aws_kms_key" "valkey_kms" {
-  description         = "KMS CMK for ElastiCache Valkey - ${var.replication_group_id}"
+  description         = "KMS CMK for ElastiCache Valkey - ${local.replication_group_name}"
   enable_key_rotation = true
 }
 
 resource "aws_kms_alias" "this" {
-  name          = "alias/valkey-${var.replication_group_id}-${random_id.suffix.hex}"
+  name          = "alias/valkey-${local.replication_group_name}-${random_id.suffix.hex}"
   target_key_id = aws_kms_key.valkey_kms.key_id
 }
 
@@ -29,34 +33,7 @@ data "aws_iam_policy_document" "this" {
     actions = [
       "kms:*"
     ]
-    resources = [aws_kms_key.valkey_kms.arn]
-  }
-  statement {
-    sid    = "CIRunnerAccess"
-    effect = "Allow"
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/ci-runner-role"]
-    }
-    actions = [
-      "kms:Update*",
-      "kms:UntagResource",
-      "kms:TagResource",
-      "kms:ScheduleKeyDeletion",
-      "kms:Revoke*",
-      "kms:ReplicateKey",
-      "kms:Put*",
-      "kms:List*",
-      "kms:ImportKeyMaterial",
-      "kms:Get*",
-      "kms:Enable*",
-      "kms:Disable*",
-      "kms:Describe*",
-      "kms:Delete*",
-      "kms:Create*",
-      "kms:CancelKeyDeletion"
-    ]
-    resources = [aws_kms_key.valkey_kms.arn]
+    resources = ["*"]
   }
   statement {
     sid    = "AWSEC2ResourcePolicy"
@@ -69,7 +46,7 @@ data "aws_iam_policy_document" "this" {
       "kms:Decrypt",
       "kms:DescribeKey"
     ]
-    resources = [aws_kms_key.valkey_kms.arn]
+    resources = ["*"]
     condition {
       test     = "StringEquals"
       variable = "kms:CallerAccount"
@@ -77,36 +54,25 @@ data "aws_iam_policy_document" "this" {
     }
   }
   statement {
-    sid    = "AWSEKSResourcePolicy"
+    sid    = "ElastiCacheServicePolicy"
     effect = "Allow"
     principals {
       type        = "Service"
-      identifiers = ["eks.amazonaws.com"]
+      identifiers = ["elasticache.amazonaws.com"]
     }
     actions = [
+      "kms:Encrypt",
       "kms:Decrypt",
-      "kms:DescribeKey"
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+      "kms:CreateGrant"
     ]
-    resources = [aws_kms_key.valkey_kms.arn]
+    resources = ["*"]
     condition {
       test     = "StringEquals"
       variable = "kms:CallerAccount"
       values   = [data.aws_caller_identity.current.account_id]
     }
   }
-}
-
-
-
-module "kms_s3" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git"
-
-  description             = "S3 kms CMK"
-  key_usage               = "ENCRYPT_DECRYPT"
-  deletion_window_in_days = 7
-  enable_key_rotation     = true
-
-  # Aliases
-  aliases = ["${var.project_name}/s3"]
-
 }

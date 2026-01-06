@@ -24,3 +24,7 @@ venv
 __pycache__
 *.pyc
 lambda.zip
+
+# Terraform secrets
+*.tfvars
+!*.tfvars.example

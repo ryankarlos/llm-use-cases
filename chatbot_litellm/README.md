@@ -4,20 +4,93 @@ A production-ready deployment of LiteLLM proxy on AWS ECS with Arize Phoenix for
 
 ## Architecture
 
-![LiteLLM ECS Architecture](generated-diagrams/litellm_ecs_architecture.png)
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                                    Users                                         │
+└─────────────────────────────────────┬───────────────────────────────────────────┘
+                                      │
+                    ┌─────────────────┴─────────────────┐
+                    ▼                                   ▼
+            ┌───────────────┐                   ┌───────────────┐
+            │   Route53     │                   │  Amazon Lex   │
+            │ litellmdemo.com│                   │ QAAssistant   │
+            └───────┬───────┘                   └───────┬───────┘
+                    │                                   │
+                    ▼                                   ▼
+            ┌───────────────┐                   ┌───────────────┐
+            │  CloudFront   │                   │    Lambda     │
+            │     CDN       │                   │  Fulfillment  │
+            └───────┬───────┘                   └───────┬───────┘
+                    │                                   │
+                    └─────────────────┬─────────────────┘
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              VPC (project-vpc)                                   │
+│  ┌────────────────────────────────────────────────────────────────────────────┐ │
+│  │                         Public Subnets                                      │ │
+│  │  ┌──────────────────────────────────────────────────────────────────────┐  │ │
+│  │  │              Application Load Balancer (Self-Signed TLS)              │  │ │
+│  │  └──────────────────────────────────┬───────────────────────────────────┘  │ │
+│  └─────────────────────────────────────┼──────────────────────────────────────┘ │
+│  ┌─────────────────────────────────────┼──────────────────────────────────────┐ │
+│  │                         Private Subnets                                     │ │
+│  │                                     ▼                                       │ │
+│  │  ┌──────────────────────────────────────────────────────────────────────┐  │ │
+│  │  │                    ECS Fargate Cluster                                │  │ │
+│  │  │  ┌────────────────────────────────────────────────────────────────┐  │  │ │
+│  │  │  │                   LiteLLM Service                               │  │  │ │
+│  │  │  │  • Unified LLM API Gateway                                      │  │  │ │
+│  │  │  │  • Cost-based routing                                           │  │  │ │
+│  │  │  │  • Phoenix tracing                                              │  │  │ │
+│  │  │  └────────────────────────────────────────────────────────────────┘  │  │ │
+│  │  └──────────────────────────────────────────────────────────────────────┘  │ │
+│  │                                     │                                       │ │
+│  │           ┌─────────────────────────┼─────────────────────────┐            │ │
+│  │           ▼                         ▼                         ▼            │ │
+│  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐        │ │
+│  │  │ Aurora Postgres │    │  Valkey/Redis   │    │  VPC Endpoints  │        │ │
+│  │  │  Serverless v2  │    │     Cache       │    │    (Bedrock)    │        │ │
+│  │  └─────────────────┘    └─────────────────┘    └────────┬────────┘        │ │
+│  └─────────────────────────────────────────────────────────┼──────────────────┘ │
+└────────────────────────────────────────────────────────────┼────────────────────┘
+                                                             │
+                    ┌────────────────────────────────────────┘
+                    ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              AWS AI Services                                     │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐             │
+│  │ Amazon Bedrock  │───▶│    Guardrails   │    │  Arize Phoenix  │             │
+│  │ Claude, Titan   │    │ Content Filter  │    │     Cloud       │             │
+│  └─────────────────┘    └─────────────────┘    └─────────────────┘             │
+└─────────────────────────────────────────────────────────────────────────────────┘
+```
 
 ### Components
 
 | Component | Description |
 |-----------|-------------|
 | **LiteLLM Proxy** | Unified API gateway for multiple LLM providers with cost-based routing |
-| **Arize Phoenix Cloud** | LLM observability platform for tracing and evaluation (cloud-hosted) |
+| **Arize Phoenix Cloud** | LLM observability platform for tracing and evaluation |
 | **Amazon Lex** | Conversational AI chatbot (QAAssistant) for natural language Q&A |
 | **AWS Bedrock** | Managed LLM service (Claude, Titan, Nova models) |
 | **Bedrock Guardrails** | Content filtering and PII detection |
 | **CloudFront + Route53** | CDN and DNS for public HTTPS access |
-| **Aurora PostgreSQL** | Serverless database for LiteLLM persistence |
+| **Aurora PostgreSQL** | Serverless v2 database for LiteLLM persistence |
 | **Valkey/Redis** | In-memory cache for session management |
+
+## Deployed Resources
+
+After running `terraform apply`, the following resources are created:
+
+| Resource | Value |
+|----------|-------|
+| Route53 Hosted Zone | `litellmdemo.com` |
+| CloudFront Domain | `cdn.litellmdemo.com` |
+| ALB DNS | `internal-litellm-*.elb.amazonaws.com` |
+| Aurora Cluster | `litellm-aurora-postgresql` |
+| ECS Cluster | `litellm-cluster` |
+| Lex Bot | `QAAssistant` |
+| Lambda Function | `lex-qa-fulfillment` |
 
 ## Features
 
@@ -33,24 +106,23 @@ A production-ready deployment of LiteLLM proxy on AWS ECS with Arize Phoenix for
 - AWS Account with appropriate permissions
 - Terraform >= 1.0
 - Docker for building LiteLLM image
-- Private CA for TLS certificates
+- Existing VPC with public/private subnets
 
 ## Quick Start
 
 ### 1. Build and Push LiteLLM Image
 
-Build base image (one-time):
-
 ```bash
-docker build -f Dockerfile.base -t litellm-base .
-```
+# Create ECR repository
+aws ecr create-repository --repository-name litellm-base
 
-Push to ECR:
-
-```bash
+# Login to ECR
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <account>.dkr.ecr.us-east-1.amazonaws.com
-docker tag litellm-base:latest <account>.dkr.ecr.us-east-1.amazonaws.com/base_images:litellm_base_image
-docker push <account>.dkr.ecr.us-east-1.amazonaws.com/base_images:litellm_base_image
+
+# Build and push
+docker build -f Dockerfile.litellm -t litellm-base .
+docker tag litellm-base:latest <account>.dkr.ecr.us-east-1.amazonaws.com/litellm-base:latest
+docker push <account>.dkr.ecr.us-east-1.amazonaws.com/litellm-base:latest
 ```
 
 ### 2. Configure Terraform Variables
@@ -58,24 +130,31 @@ docker push <account>.dkr.ecr.us-east-1.amazonaws.com/base_images:litellm_base_i
 Create a `terraform.tfvars` file:
 
 ```hcl
-env                       = "dev"
-project_name              = "litellm-demo"
-hosted_zone_name          = "example.com"
-subdomain                 = "litellm"
-cloudfront_subdomain      = "api"
-certificate_authority_arn = "arn:aws:acm-pca:us-east-1:123456789:certificate-authority/xxx"
-image_uri_litellm         = "<account>.dkr.ecr.us-east-1.amazonaws.com/litellm:latest"
+env               = "dev"
+project_name      = "litellm-demo"
+hosted_zone_name  = "litellmdemo.com"
+subdomain         = "api"
+vpc_name          = "project-vpc"
+image_uri_litellm = "<account>.dkr.ecr.us-east-1.amazonaws.com/litellm-base:latest"
 
-s3_buckets = {
-  lb_access_logs = "my-lb-logs-bucket"
-  litellm        = "my-litellm-config-bucket"
+tag = {
+  name = "litellm-demo"
 }
 
+# Secrets - Update after deployment with actual keys
 litellm_secret_name   = "litellm-secrets"
-litellm_secret_values = jsonencode({
-  LITELLM_MASTER_KEY = "sk-xxx"
-  LITELLM_SALT_KEY   = "salt-xxx"
-})
+litellm_secret_values = "{\"LITELLM_MASTER_KEY\":\"sk-xxx\",\"LITELLM_SALT_KEY\":\"salt-xxx\"}"
+
+# Phoenix API key (optional)
+phoenix_api_key = ""
+
+# Aurora scaling
+aurora_scaling_config = {
+  min_capacity = 0.5
+  max_capacity = 2
+}
+
+skip_final_snapshot = true
 ```
 
 ### 3. Deploy Infrastructure
@@ -83,15 +162,30 @@ litellm_secret_values = jsonencode({
 ```bash
 cd terraform
 terraform init
-terraform plan
-terraform apply
+terraform plan -out=tfplan
+terraform apply tfplan
 ```
 
-### 4. Access Services
+### 4. Update Secrets
 
-- **LiteLLM API**: `https://litellm.example.com/`
-- **Phoenix Cloud**: `https://app.phoenix.arize.com/` (configure API key in terraform.tfvars)
-- **Lex Bot**: Available in AWS Console under Amazon Lex > QAAssistant
+After deployment, update the secrets with actual values:
+
+```bash
+# Generate keys
+MASTER_KEY=$(openssl rand -hex 32)
+SALT_KEY=$(openssl rand -hex 32)
+
+# Update secret
+aws secretsmanager put-secret-value \
+  --secret-id litellm-secrets \
+  --secret-string "{\"LITELLM_MASTER_KEY\":\"sk-$MASTER_KEY\",\"LITELLM_SALT_KEY\":\"$SALT_KEY\"}"
+```
+
+### 5. Access Services
+
+- **LiteLLM API**: `https://cdn.litellmdemo.com/` (via CloudFront)
+- **Phoenix Cloud**: `https://app.phoenix.arize.com/`
+- **Lex Bot**: AWS Console > Amazon Lex > QAAssistant
 
 ## Using the Lex Chatbot
 
@@ -103,8 +197,8 @@ import boto3
 lex = boto3.client('lexv2-runtime')
 
 response = lex.recognize_text(
-    botId='<bot-id>',
-    botAliasId='<alias-id>',
+    botId='XGILVCLOLH',  # Get from terraform output
+    botAliasId='TSTALIASID',
     localeId='en_US',
     sessionId='user-123',
     text='What is the capital of France?'
@@ -119,35 +213,8 @@ The `config.yaml` configures:
 
 - **Models**: Claude 3 Sonnet/Haiku, Titan Text, Nova Pro
 - **Routing**: Cost-based routing strategy
-- **Callbacks**: Arize Phoenix for tracing, Prometheus for metrics
+- **Callbacks**: Arize Phoenix for tracing
 - **Guardrails**: Bedrock content filter with PII anonymization
-
-## Arize Phoenix Evaluation
-
-Use SQuAD dataset for ground truth evaluation:
-
-```python
-from phoenix.client import Client
-from datasets import load_dataset
-
-# Load SQuAD from HuggingFace
-squad = load_dataset("squad", split="validation[:100]")
-
-# Create Phoenix dataset
-client = Client()
-dataset = client.create_dataset(
-    name="squad-qa-evaluation",
-    description="SQuAD Q&A pairs for LLM evaluation"
-)
-
-# Add examples with ground truth
-for item in squad:
-    client.add_example(
-        dataset_id=dataset.id,
-        input={"question": item["question"], "context": item["context"]},
-        output={"answer": item["answers"]["text"][0]}
-    )
-```
 
 ## Terraform Resources
 
@@ -160,35 +227,29 @@ for item in squad:
 | Aurora PostgreSQL | `main.tf` |
 | Valkey/Redis | `main.tf` |
 | KMS Keys | `kms.tf` |
+| Secrets Manager | `main.tf` |
 
 ## Cost Optimization
 
-- ECS Fargate Spot for non-production
-- Aurora Serverless v2 scales to zero
+- Aurora Serverless v2 scales to zero during idle periods
+- Cost-based routing selects cheapest capable model
 - CloudFront caching reduces origin requests
-- Cost-based routing selects cheapest model
+- Single-AZ deployment option for dev environments
 
 ## Security
 
-- All traffic encrypted with TLS 1.2+
+- All traffic encrypted with TLS (self-signed cert for ALB)
 - Secrets stored in AWS Secrets Manager
-- VPC endpoints for AWS services
+- VPC endpoints for Bedrock (private connectivity)
 - Bedrock Guardrails for content safety
 - PII anonymization enabled
 
-## Monitoring
+## Cleanup
 
-- CloudWatch Logs for all services
-- Arize Phoenix Cloud for LLM-specific metrics
-- Prometheus metrics from LiteLLM
-- CloudWatch alarms for ECS health
-
-## Arize Phoenix Cloud Setup
-
-1. Create an account at [Arize Phoenix](https://phoenix.arize.com/)
-2. Get your API key from the Phoenix dashboard
-3. Set the `phoenix_api_key` variable in your `terraform.tfvars`
-4. Traces will automatically be sent to your Phoenix cloud account
+```bash
+cd terraform
+terraform destroy
+```
 
 ## License
 
