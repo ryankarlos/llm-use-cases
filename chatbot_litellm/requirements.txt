@@ -1,4 +1,12 @@
-litellm[proxy]==1.73.6 # Specify the litellm version you want to use
+
+litellm
 prometheus_client
-langfuse
-prisma
+arize-phoenix-otel
+locust
+openai
+arize-phoenix-client 
+openinference-instrumentation-openai 
+datasets 
+duckdb 
+pandas
+arize-phoenix-evals

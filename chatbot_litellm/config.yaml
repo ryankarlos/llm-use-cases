@@ -15,7 +15,7 @@ model_list:
 
 
 litellm_settings:
-  callbacks: ["arize_phoenix"]
+  callbacks: ["arize_phoenix",  "prometheus"]
   cache: True
   cache_params:
     type: redis
