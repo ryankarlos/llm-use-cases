@@ -147,6 +147,24 @@ resource "aws_secretsmanager_secret_version" "litellm_api_key" {
   secret_string = var.litellm_api_key
 }
 
+# =============================================================================
+# Secrets Manager - Redis Password
+# =============================================================================
+resource "aws_secretsmanager_secret" "redis_password" {
+  name_prefix             = "${var.project_name}-redis-password-"
+  recovery_window_in_days = 0
+
+  tags = {
+    Project     = var.project_name
+    Environment = var.env
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "redis_password" {
+  secret_id     = aws_secretsmanager_secret.redis_password.id
+  secret_string = random_password.redis_password.result
+}
+
 
 # =============================================================================
 # Aurora PostgreSQL
@@ -613,7 +631,8 @@ resource "aws_iam_role_policy" "ecs_secrets_access" {
       Resource = [
         aws_secretsmanager_secret.litellm_master_salt.arn,
         aws_secretsmanager_secret.litellm_db_url.arn,
-        aws_secretsmanager_secret.phoenix_api_key.arn
+        aws_secretsmanager_secret.phoenix_api_key.arn,
+        aws_secretsmanager_secret.redis_password.arn
       ]
     }]
   })
@@ -685,7 +704,6 @@ resource "aws_ecs_task_definition" "litellm" {
         { name = "LITELLM_LOG", value = var.litellm_log_level },
         { name = "REDIS_HOST", value = module.elasticache.replication_group_primary_endpoint_address },
         { name = "REDIS_PORT", value = tostring(var.redis_port) },
-        { name = "REDIS_PASSWORD", value = random_password.redis_password.result },
         { name = "REDIS_SSL", value = "True" },
         { name = "GUARDRAIL_ID", value = aws_bedrock_guardrail.content_filter.guardrail_id },
         { name = "GUARDRAIL_VERSION", value = aws_bedrock_guardrail_version.content_filter.version },
@@ -714,6 +732,10 @@ resource "aws_ecs_task_definition" "litellm" {
         {
           name      = "PHOENIX_AP_KEY"
           valueFrom = aws_secretsmanager_secret.phoenix_api_key.arn
+        },
+        {
+          name      = "REDIS_PASSWORD"
+          valueFrom = aws_secretsmanager_secret.redis_password.arn
         }
       ]
 
