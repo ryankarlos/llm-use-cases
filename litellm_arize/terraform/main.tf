@@ -1,7 +1,8 @@
 locals {
-  public_subnet_ids = data.aws_subnets.public_subnets.ids
-  config_hash       = filemd5("${path.module}/../config.yaml")
-  dockerfile_hash   = filemd5("${path.module}/../Dockerfile.litellm")
+  public_subnet_ids   = module.vpc.public_subnets
+  private_subnet_ids  = module.vpc.private_subnets
+  config_hash         = filemd5("${path.module}/../config.yaml")
+  dockerfile_hash     = filemd5("${path.module}/../Dockerfile.litellm")
 
   serverless_instances = {
     1 = {
@@ -171,7 +172,7 @@ resource "aws_secretsmanager_secret_version" "redis_password" {
 # =============================================================================
 resource "aws_db_subnet_group" "aurora" {
   name       = "${var.project_name}-aurora-subnet-group"
-  subnet_ids = local.database_subnet_ids
+  subnet_ids = local.private_subnet_ids
 
   tags = {
     Project     = var.project_name
@@ -188,11 +189,11 @@ module "aurora_db" {
   storage_encrypted = true
   master_username   = "postgres"
 
-  vpc_id               = data.aws_vpc.main.id
+  vpc_id               = module.vpc.vpc_id
   db_subnet_group_name = aws_db_subnet_group.aurora.name
   security_group_ingress_rules = {
     vpc_ingress = {
-      cidr_ipv4 = var.ingress_cidr_range
+      cidr_ipv4 = var.vpc_cidr
     }
   }
 
@@ -231,17 +232,17 @@ module "elasticache" {
   create_replication_group = var.create_replication_group
   replication_group_id     = "${var.project_name}-valkey"
 
-  vpc_id = data.aws_vpc.main.id
+  vpc_id = module.vpc.vpc_id
   security_group_rules = {
     ingress_vpc = {
       description = "VPC traffic"
-      cidr_ipv4   = var.ingress_cidr_range
+      cidr_ipv4   = var.vpc_cidr
     }
   }
 
   subnet_group_name        = "${var.project_name}-valkey-subnet"
   subnet_group_description = "Valkey subnet group for ${var.env}"
-  subnet_ids               = local.database_subnet_ids
+  subnet_ids               = local.private_subnet_ids
 
   create_parameter_group      = var.create_parameter_group
   parameter_group_family      = var.parameter_group_family
@@ -452,7 +453,7 @@ resource "aws_wafv2_web_acl" "litellm" {
 resource "aws_security_group" "alb" {
   name        = "${var.project_name}-alb-sg"
   description = "Security group for ALB - restricted to allowed IPs"
-  vpc_id      = data.aws_vpc.main.id
+  vpc_id      = module.vpc.vpc_id
 
   ingress {
     description = "HTTP from allowed IPs"
@@ -480,7 +481,7 @@ resource "aws_security_group" "alb" {
 resource "aws_security_group" "ecs" {
   name        = "${var.project_name}-ecs-sg"
   description = "Security group for ECS tasks"
-  vpc_id      = data.aws_vpc.main.id
+  vpc_id      = module.vpc.vpc_id
 
   ingress {
     description     = "Allow ALB to ECS"
@@ -534,7 +535,7 @@ resource "aws_lb_target_group" "litellm" {
   name        = "${var.project_name}-tg"
   port        = var.litellm_port
   protocol    = "HTTP"
-  vpc_id      = data.aws_vpc.main.id
+  vpc_id      = module.vpc.vpc_id
   target_type = "ip"
 
   health_check {
