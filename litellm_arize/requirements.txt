@@ -1,7 +1,6 @@
-
 litellm
 prometheus_client
-arize-phoenix-otel
+arize-phoenix
 locust
 openai
 arize-phoenix-client 
@@ -9,4 +8,4 @@ openinference-instrumentation-openai
 datasets 
 duckdb 
 pandas
-arize-phoenix-evals
+httpx<0.28

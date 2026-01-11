@@ -6,7 +6,7 @@ from locust import HttpUser, task, between, events
 overhead_durations = []
 
 @events.request.add_listener
-def on_request(request_type, name, response_time, response_length, response, context, exception, start_time, url, **kwargs):
+def on_request(request_type, name, response_time, response_length, **kwargs):
     if response and hasattr(response, 'headers'):
         overhead_duration = response.headers.get('x-litellm-overhead-duration-ms')
         if overhead_duration:
@@ -27,20 +27,26 @@ class MyUser(HttpUser):
     wait_time = between(0.5, 1)  # Random wait time between requests
 
     def on_start(self):
-        self.api_key = os.getenv('API_KEY')
+        self.api_key = os.getenv('API_KEY', 'sk-L5jvenh9qObvYcmc9L74Cw')
         self.client.headers.update({'Authorization': f'Bearer {self.api_key}'})
 
-    @task
+    @task(5)
     def litellm_completion(self):
         # no cache hits with this
         payload = {
-            "model": "fake-openai-endpoint",
-            "messages": [{"role": "user", "content": f"{uuid.uuid4()} This is a test there will be no cache hits and we'll fill up the context" * 150}],
+            "model": "nova-pro",
+            "messages": [{"role": "user", "content": "Say hello world" }],
             "user": "my-new-end-user-1"
         }
         response = self.client.post("chat/completions", json=payload)
-        
-        if response.status_code != 200:
-            # log the errors in error.txt
-            with open("error.txt", "a") as error_log:
-                error_log.write(response.text + "\n")
+
+
+    @task(5)
+    def litellm_completion(self):
+        # no cache hits with this
+        payload = {
+            "model": "nova-micro",
+            "messages": [{"role": "user", "content": "Say hello world"}],
+            "user": "my-new-end-user-1"
+        }
+        response = self.client.post("chat/completions", json=payload)

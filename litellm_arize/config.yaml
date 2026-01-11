@@ -1,7 +1,11 @@
 model_list:
-  - model_name: titan-text
+  - model_name: nova-micro
     litellm_params:
-      model: bedrock/amazon.titan-text-express-v1
+      model: bedrock/amazon.nova-micro-v1:0
+      aws_region_name: us-east-1
+  - model_name: nova-lite
+    litellm_params:
+      model: bedrock/amazon.nova-2-lite-v1:0
       aws_region_name: us-east-1
   - model_name: nova-pro
     litellm_params:
@@ -30,6 +34,8 @@ guardrails:
       mode: "during_call"
       guardrailIdentifier: os.environ/GUARDRAIL_ID
       guardrailVersion: os.environ/GUARDRAIL_VERSION
+      default_on: true
+
 
 router_settings:
   routing_strategy: "cost-based-routing"
@@ -48,4 +54,4 @@ environment_variables:
   PHOENIX_API_KEY: os.environ/PHOENIX_AP_KEY
   PHOENIX_COLLECTOR_ENDPOINT: os.environ/PHOENIX_COLLECTOR_ENDPOINT
   PHOENIX_PROJECT_NAME: os.environ/PHOENIX_PROJECT_NAME
-
+  STORE_MODEL_IN_DB: True

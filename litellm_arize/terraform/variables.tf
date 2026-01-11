@@ -4,11 +4,6 @@ variable "project_name" {
   default     = "litellm-demo"
 }
 
-variable "image_uri_litellm" {
-  description = "Docker image URI for LiteLLM ECS"
-  type        = string
-}
-
 variable "tag" {
   description = "Tag object"
   type = object({
@@ -271,15 +266,9 @@ variable "private_subnet_cidrs" {
 }
 
 variable "allowed_cidr_blocks" {
-  description = "CIDR blocks allowed to access ALB (your IP address)"
+  description = "CIDR blocks allowed to access ALB (your IP address). Also used for WAF whitelist."
   type        = list(string)
   default     = ["0.0.0.0/0"]
-}
-
-variable "waf_whitelisted_ips" {
-  description = "IP addresses to whitelist in WAF (CIDR format, e.g., 203.0.113.50/32)"
-  type        = list(string)
-  default     = []
 }
 
 variable "waf_rate_limit" {

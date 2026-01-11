@@ -264,7 +264,7 @@ resource "aws_wafv2_ip_set" "whitelist" {
   description        = "Whitelisted IP addresses"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
-  addresses          = var.waf_whitelisted_ips
+  addresses          = var.allowed_cidr_blocks
 
   tags = {
     Project     = var.project_name
