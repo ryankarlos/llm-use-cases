@@ -20,9 +20,9 @@ def get_env_or_prompt(env_var: str, prompt_msg: str, is_secret: bool = False) ->
 
 
 # # Phoenix configuration
-# PHOENIX_COLLECTOR_ENDPOINT = get_env_or_prompt(
-#     "PHOENIX_COLLECTOR_ENDPOINT", "Enter Phoenix Collector Endpoint: "
-# )
+PHOENIX_COLLECTOR_ENDPOINT = get_env_or_prompt(
+    "PHOENIX_COLLECTOR_ENDPOINT", "Enter Phoenix Collector Endpoint: "
+)
 PHOENIX_API_KEY = get_env_or_prompt(
     "PHOENIX_API_KEY", "Enter Phoenix API Key: ", is_secret=True
 )
@@ -33,7 +33,7 @@ LITELLM_BASE_URL = get_env_or_prompt("LITELLM_BASE_URL", "Enter LiteLLM Base URL
 LITELLM_API_KEY = get_env_or_prompt("LITELLM_API_KEY", "Enter LiteLLM API Key: ", is_secret=True)
 
 # Set environment variables
-# os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = PHOENIX_COLLECTOR_ENDPOINT
+os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = PHOENIX_COLLECTOR_ENDPOINT
 os.environ["PHOENIX_API_KEY"] = PHOENIX_API_KEY
 os.environ["OTEL_EXPORTER_OTLP_HEADERS"] = f"api_key={PHOENIX_API_KEY}"
 os.environ["PHOENIX_CLIENT_HEADERS"] = f"api_key={PHOENIX_API_KEY}"
@@ -55,7 +55,9 @@ given answer correctly answers the question. Here is the data:
     is factually incorrect"""
 
 
-spans_df = px.Client().get_spans_dataframe(project_name=PHOENIX_PROJECT_NAME, root_spans_only=True)
+spans_df = px.Client().get_spans_dataframe(project_name=PHOENIX_PROJECT_NAME)
+spans_df = spans_df[spans_df["span_kind"] == "LLM"]
+spans_df = spans_df.sort_values(by="start_time", ascending=False).iloc[0:30]
 spans_df = spans_df[["context.span_id", "attributes.input.value", "attributes.output.value"]]
 spans_df = spans_df.set_index("context.span_id")
 spans_df = spans_df.rename(
@@ -71,8 +73,6 @@ response_classifications = llm_classify(
     template=prompt_template,
     model=eval_model,
     rails=["correct", "incorrect"],
-    provide_explanation=True
+    provide_explanation=True,
+    max_retries=1
 )
-
-response_classifications = response_classifications[['prompt', '"Question", "Answer", label']]
-print(response_classifications)
