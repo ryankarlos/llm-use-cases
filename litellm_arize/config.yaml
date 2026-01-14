@@ -11,6 +11,14 @@ model_list:
     litellm_params:
       model: bedrock/us.amazon.nova-pro-v1:0
       aws_region_name: us-east-1
+  - model_name: gemini/gemini-2.5-flash
+    litellm_params:
+      model: gemini/gemini-2.0-flash
+      api_key: os.environ/GEMINI_API_KEY
+  - model_name: gemini/gemini-2.5-pro
+    litellm_params:
+      model: gemini/gemini-2.0-pro
+      api_key: os.environ/GEMINI_API_KEY
   - model_name: fake-openai-endpoint
     litellm_params:
       model: openai/fake
@@ -26,6 +34,7 @@ litellm_settings:
     host: os.environ/REDIS_HOST
     port: os.environ/REDIS_PORT
     password: os.environ/REDIS_PASSWORD
+
 
 guardrails:
   - guardrail_name: "bedrock-content-filter"
@@ -49,6 +58,7 @@ general_settings:
   proxy_batch_write_at: 60
   database_connection_pool_limit: 10
   allow_requests_on_db_unavailable: True
+
 
 environment_variables:
   PHOENIX_API_KEY: os.environ/PHOENIX_AP_KEY

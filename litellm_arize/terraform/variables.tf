@@ -283,3 +283,10 @@ variable "litellm_api_key" {
   default     = ""
   sensitive   = true
 }
+
+variable "gemini_api_key" {
+  description = "Google Gemini API key"
+  type        = string
+  default     = ""
+  sensitive   = true
+}

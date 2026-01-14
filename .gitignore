@@ -28,8 +28,7 @@ __pycache__
 lambda.zip
 
 # Terraform secrets
-*.tfvars
-!*.tfvars.example
+terraform.tfvars
 llmperf
 .venv
 venv

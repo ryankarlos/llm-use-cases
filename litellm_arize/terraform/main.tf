@@ -166,6 +166,24 @@ resource "aws_secretsmanager_secret_version" "redis_password" {
   secret_string = random_password.redis_password.result
 }
 
+# =============================================================================
+# Secrets Manager - Gemini API Key
+# =============================================================================
+resource "aws_secretsmanager_secret" "gemini_api_key" {
+  name_prefix             = "${var.project_name}-gemini-api-key-"
+  recovery_window_in_days = 0
+
+  tags = {
+    Project     = var.project_name
+    Environment = var.env
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "gemini_api_key" {
+  secret_id     = aws_secretsmanager_secret.gemini_api_key.id
+  secret_string = var.gemini_api_key
+}
+
 
 # =============================================================================
 # Aurora PostgreSQL
@@ -633,7 +651,8 @@ resource "aws_iam_role_policy" "ecs_secrets_access" {
         aws_secretsmanager_secret.litellm_master_salt.arn,
         aws_secretsmanager_secret.litellm_db_url.arn,
         aws_secretsmanager_secret.phoenix_api_key.arn,
-        aws_secretsmanager_secret.redis_password.arn
+        aws_secretsmanager_secret.redis_password.arn,
+        aws_secretsmanager_secret.gemini_api_key.arn
       ]
     }]
   })
@@ -737,6 +756,10 @@ resource "aws_ecs_task_definition" "litellm" {
         {
           name      = "REDIS_PASSWORD"
           valueFrom = aws_secretsmanager_secret.redis_password.arn
+        },
+        {
+          name      = "GEMINI_API_KEY"
+          valueFrom = aws_secretsmanager_secret.gemini_api_key.arn
         }
       ]
 
